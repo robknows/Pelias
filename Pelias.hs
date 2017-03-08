@@ -1,4 +1,4 @@
 module Pelias where
 
-extract :: String -> String -> String
-extract key json = "value"
+extract :: String -> String -> Maybe String
+extract key json = Just "value"
