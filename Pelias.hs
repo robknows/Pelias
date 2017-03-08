@@ -1,9 +1,8 @@
 module Pelias where
 
-type JSON = String
-
-parse :: String -> JSON
-parse json = json
+data JSON = Empty
+          | JSON String String
 
 extract :: String -> JSON -> Maybe String
-extract key json = Just "value"
+extract key Empty = Nothing
+extract key (JSON k v) = (Just v)
