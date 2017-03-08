@@ -3,8 +3,8 @@ module Test where
 import RobUnit
 import Pelias
 
-runTests :: IO ()
-runTests = do
+main :: IO ()
+main = do
   putStrLn "=========RUNNING TESTS========="
   (putStr . concat . appendFailedCount) tests
   putStrLn "ALL DONE"

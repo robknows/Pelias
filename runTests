@@ -1,2 +1,0 @@
-#!/bin/bash
-ghci Test.hs RobUnit.hs Pelias.hs
