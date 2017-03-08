@@ -11,7 +11,13 @@ main = do
 
 tests :: [String]
 tests = [
-  makeTest "parse the only key from a json object with only one element"
-    (parse "key" "{key: \"value\"}")
-    "value"
-        ]
+  makeTest "can represent empty object"
+    (extract "key" (Empty :: JSON String))
+    Nothing,
+  makeTest "can represent a single string field"
+    (extract "key" (JSONObject "key" "value"))
+    (Just "value"),
+  makeTest "can represent a single integer field"
+    (extract "key" (JSONObject "key" 3))
+    (Just 3)
+  ]
