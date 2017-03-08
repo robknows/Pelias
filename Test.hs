@@ -12,6 +12,6 @@ main = do
 tests :: [String]
 tests = [
   makeTest "parse the only key from a json object with only one element"
-    (extract "key" "{\"key\": \"value\"}")
+    (extract "key" (parse "{\"key\": \"value\"}"))
     (Just "value")
   ]
