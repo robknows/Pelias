@@ -1,8 +1,7 @@
 module Pelias where
 
-data JSON = Empty
-          | JSON String String
+data JSON keytype = Empty | JSONObject String keytype
 
-extract :: String -> JSON -> Maybe String
+extract :: String -> JSON a -> Maybe a
 extract key Empty = Nothing
-extract key (JSON k v) = (Just v)
+extract key (JSONObject k v) = (Just v)
