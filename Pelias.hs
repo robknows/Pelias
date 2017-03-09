@@ -1,6 +1,6 @@
 module Pelias where
 
-data JSON keytype = Empty | JSONObject String keytype
+data JSON a = Empty | JSONObject String a
 
 extract :: String -> JSON a -> Maybe a
 extract key Empty = Nothing
