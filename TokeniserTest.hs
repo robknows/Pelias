@@ -119,6 +119,9 @@ tests = [
   makeTest "tokenising an object with a few pairs of different types"
     (tokens JObject "{\"x\":22.5E-7,\"name\":\"buddha\",\"stuff\":[],\"t\":true}")
     [LCurly, Quote, Chr, Quote, Colon, Digit, Digit, Dot, Digit, Exp EM, Digit, Comma, Quote, Chr, Chr, Chr, Chr, Quote, Colon, Quote, Chr, Chr, Chr, Chr, Chr, Chr, Quote, Comma, Quote, Chr, Chr, Chr, Chr, Chr, Quote, Colon, LSquare, RSquare, Comma, Quote, Chr, Quote, Colon, T, RCurly],
+  makeTest "tokenising a  big object with lots of whitespace and multiple layers of nesting"
+    (tokens JObject "{\"menu\":{\"id\" : \"file\",\n\t\"value\" : \"File\",\n\t\"popup\" : {\"menuitem\" : [1 , 2 ,3, 4]}\n\t}\n}")
+    [LCurly,Quote,Chr,Chr,Chr,Chr,Quote,Colon,LCurly,Quote,Chr,Chr,Quote,Colon,Quote,Chr,Chr,Chr,Chr,Quote,Comma,Quote,Chr,Chr,Chr,Chr,Chr,Quote,Colon,Quote,Chr,Chr,Chr,Chr,Quote,Comma,Quote,Chr,Chr,Chr,Chr,Chr,Quote,Colon,LCurly,Quote,Chr,Chr,Chr,Chr,Chr,Chr,Chr,Chr,Quote,Colon,LSquare,Digit,Comma,Digit,Comma,Digit,Comma,Digit,RSquare,RCurly,RCurly,RCurly],
   
   -- Array
   makeTest "tokenising an empty array"

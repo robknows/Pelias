@@ -21,7 +21,8 @@ tokens jsonPart = snd . (tokenise jsonPart)
 -- The "tokenise" functions, take the String, tokenise what they are meant to
 --   and return the remainder of the input and the tokens they gleaned.
 
--- This is so I don't have to litter my code with strip.
+-- This is so I don't have to litter my code with strip. Although as I have now
+--   learnt, I have had to include some anyway.
 tokenise :: GrammarPart -> String -> (String, [Token])
 tokenise JDigits       = tokeniseDigits . strip
 tokenise JInt          = tokeniseInt . strip
@@ -44,8 +45,8 @@ tokeniseDigits input = (drop nDigits input, take nDigits (repeat Digit))
 
 tokeniseInt :: String -> (String, [Token])
 tokeniseInt ('-' : input) = (noLeadingDigits, Minus : digits)
-  where (noLeadingDigits, digits) = (tokenise JDigits) input
-tokeniseInt input = (tokenise JDigits) input
+  where (noLeadingDigits, digits) = tokenise JDigits input
+tokeniseInt input = tokenise JDigits input
 
 tokeniseSimpleNumber :: String -> (String, [Token])
 tokeniseSimpleNumber input = 
@@ -53,8 +54,8 @@ tokeniseSimpleNumber input =
     ('.' : digits) -> (noLeadingDecimal, leadingInt ++ [Dot] ++ decimalPart)
     _              -> (noLeadingInt, leadingInt)
   where
-    (noLeadingInt, leadingInt)      = (tokenise JInt) input
-    (noLeadingDecimal, decimalPart) = (tokenise JDigits) (drop 1 noLeadingInt)
+    (noLeadingInt, leadingInt)      = tokenise JInt input
+    (noLeadingDecimal, decimalPart) = tokenise JDigits (drop 1 noLeadingInt)
 
 tokeniseExp :: String -> (String, [Token])
 tokeniseExp ('E' : '+' : rest) = (rest, [Exp EP])
@@ -70,13 +71,15 @@ tokeniseNumber input =
   then (noNumber, leadingSimpleNum ++ exp ++ expDigits)
   else (noLeadingSimpleNum, leadingSimpleNum)
   where
-    (noLeadingSimpleNum, leadingSimpleNum) = (tokenise JSimpleNumber) input
-    (noExp, exp)                           = (tokenise JExp) noLeadingSimpleNum
-    (noNumber, expDigits)                  = (tokenise JDigits) noExp
+    (noLeadingSimpleNum, leadingSimpleNum) = tokenise JSimpleNumber input
+    (noExp, exp)                           = tokenise JExp noLeadingSimpleNum
+    (noNumber, expDigits)                  = tokenise JDigits noExp
 
 tokeniseString :: String -> (String, [Token])
 tokeniseString ('\"' : '\"' : rest) = (rest, Quote : [Quote])
-tokeniseString ('\"' : rest)        = tokeniseChars' [] rest
+tokeniseString ('\"' : rest)        = tokeniseChars' [] (strip rest)
+tokeniseString something            = error ("Confused by " ++ something ++ "\n")
+-- String parsing blackbox...
 tokeniseChars' :: [Token] -> String -> (String, [Token])
 tokeniseChars' acc ('\"' : rest)       = (rest, [Quote] ++ acc ++ [Quote])
 tokeniseChars' acc ('\\' : 'u' : rest) =
@@ -93,21 +96,21 @@ tokeniseChars' acc []                  = ([], acc)
 tokeniseArray :: String -> (String, [Token])
 tokeniseArray ('[' : ']' : rest) = (rest, LSquare : [RSquare])
 tokeniseArray input = ((drop 1 rest), [LSquare] ++ tokenised ++ [RSquare])
-  where (rest, tokenised) = (tokenise JElements) (drop 1 input)
+  where (rest, tokenised) = tokenise JElements (drop 1 input)
 
 tokeniseElements :: String -> (String, [Token])
 tokeniseElements input =
-  case noValue of
+  case strip noValue of
     (',' : rest) -> (noElements, value ++ [Comma] ++ elements)
     _            -> (noValue, value)
   where 
-    (noValue, value)       = (tokenise JValue) input
-    (noElements, elements) = (tokenise JElements) (drop 1 noValue)
+    (noValue, value)       = tokenise JValue input
+    (noElements, elements) = tokenise JElements (drop 1 (strip noValue))
 
 tokeniseObject :: String -> (String, [Token])
 tokeniseObject ('{' : '}' : rest) = (rest, LCurly : [RCurly])
 tokeniseObject input = ((drop 1 rest), [LCurly] ++ tokenised ++ [RCurly])
-  where (rest, tokenised) = (tokenise JMembers) (drop 1 input)
+  where (rest, tokenised) = tokenise JMembers (drop 1 input)
 
 tokeniseMembers :: String -> (String, [Token])
 tokeniseMembers input =
@@ -115,8 +118,8 @@ tokeniseMembers input =
     (',' : rest) -> (noMembers, pair ++ [Comma] ++ members)
     _            -> (noPair, pair)
   where 
-    (noPair, pair)       = (tokenise JPair) input
-    (noMembers, members) = (tokenise JMembers) (drop 1 noPair)
+    (noPair, pair)       = tokenise JPair input
+    (noMembers, members) = tokenise JMembers (drop 1 noPair)
 
 tokenisePair :: String -> (String, [Token])
 tokenisePair input =
@@ -124,8 +127,8 @@ tokenisePair input =
   then (noPair, key ++ [Colon] ++ value)
   else error "Bad pair - tokenising failed"
   where
-    (noKey, key)    = (tokenise JString) input
-    (noPair, value) = (tokenise JValue) (drop 1 noKey)
+    (noKey, key)    = tokenise JString input
+    (noPair, value) = tokenise JValue (drop 1 (strip noKey))
 
 tokeniseBool :: String -> (String, [Token])
 tokeniseBool input
