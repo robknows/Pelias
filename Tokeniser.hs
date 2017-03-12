@@ -88,6 +88,7 @@ tokeniseChars' acc ('\\' : c : rest)   =
   then tokeniseChars' (acc ++ [Chr]) rest
   else error "String with bad backslash usage - tokenising failed"
 tokeniseChars' acc (c : rest)          = tokeniseChars' (acc ++ [Chr]) rest
+tokeniseChars' acc []                  = ([], acc)
 
 tokeniseArray :: String -> (String, [Token])
 tokeniseArray ('[' : ']' : rest) = (rest, LSquare : [RSquare])
