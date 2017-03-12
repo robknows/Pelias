@@ -94,5 +94,39 @@ tests = [
   -- Null
   makeTest "tokenising null"
     (tokens JNull "null")
-    [N]
+    [N],
+  
+  -- Pair
+  makeTest "tokenising a pair"
+    (tokens JPair "\"memes\":420e+247")
+    [Quote, Chr, Chr, Chr, Chr, Chr, Quote, Colon, Digit, Digit, Digit, Exp LEP, Digit, Digit, Digit],
+  makeTest "tokenising a pair whose value is a bool"
+    (tokens JPair "\"admin\":false")
+    [Quote, Chr, Chr, Chr, Chr, Chr, Quote, Colon, F],
+  makeTest "tokenising a pair whose value is an empty array"
+    (tokens JPair "\"willsPals\":[]")
+    [Quote, Chr, Chr, Chr, Chr, Chr, Chr, Chr, Chr, Chr, Quote, Colon, LSquare, RSquare],
+    
+  -- Object
+  makeTest "tokenising an empty object"
+    (tokens JObject "{}")
+    [LCurly, RCurly],
+  makeTest "tokenising an object with one pair"
+    (tokens JObject "{\"x\":\"d\"}")
+    [LCurly, Quote, Chr, Quote, Colon, Quote, Chr, Quote, RCurly],
+  makeTest "tokenising an object with a few pairs of different types"
+    (tokens JObject "{\"x\":22.5E-7,\"name\":\"buddha\",\"stuff\":[],\"t\":true}")
+    [LCurly, Quote, Chr, Quote, Colon, Digit, Digit, Dot, Digit, Exp EM, Digit, Comma, Quote, Chr, Chr, Chr, Chr, Quote, Colon, Quote, Chr, Chr, Chr, Chr, Chr, Chr, Quote, Comma, Quote, Chr, Chr, Chr, Chr, Chr, Quote, Colon, LSquare, RSquare, Comma, Quote, Chr, Quote, Colon, T, RCurly],
+  
+  -- Array
+  makeTest "tokenising an empty array"
+    (tokens JArray "[]")
+    [LSquare, RSquare],
+  makeTest "tokenising an array with one thing"
+    (tokens JArray "[\"x\"]")
+    [LSquare, Quote, Chr, Quote, RSquare],
+  makeTest "tokenising an array with a few things"
+    (tokens JArray "[{\"key\":true,\"code\":0099}, null, {}]")
+    [LSquare, LCurly, Quote, Chr, Chr, Chr, Quote, Colon, T, Comma, Quote, Chr, Chr, Chr, Chr, Quote, Colon, Digit, Digit, Digit, Digit, RCurly, Comma, N, Comma, LCurly, RCurly, RSquare]
+  
         ]
