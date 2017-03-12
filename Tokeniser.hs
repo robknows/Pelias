@@ -1,19 +1,22 @@
-module Pelias where
+module Tokeniser where
 
 import Data.Char
 import Data.String.Utils
 
 -- (E) for the letter 'E'. (L)owercase. (P)lus. (M)inus.
 data Exponent = E | EP | EM | LE | LEP | LEM
-  deriving Show
+  deriving (Show, Eq)
 
 data Token = Digit | Minus | Dot | Exp Exponent | Chr | Quote | 
              LSquare | RSquare | Comma | LCurly | RCurly | Colon | T | F | N
-  deriving Show
+  deriving (Show, Eq)
 
 -- Used for the tokenise function
 data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JString |
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
+
+tokens :: GrammarPart -> String -> [Token]
+tokens jsonPart = snd . (tokenise jsonPart)
 
 -- The "tokenise" functions, take the String, tokenise what they are meant to
 --   and return the remainder of the input and the tokens they gleaned.
