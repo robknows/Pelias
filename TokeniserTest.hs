@@ -3,6 +3,8 @@ module TokeniserTest where
 import Tokeniser
 import RobUnit
 
+-- Todo: Use quickcheck
+
 main :: IO ()
 main = do
   putStrLn "=========RUNNING TESTS========="
