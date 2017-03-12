@@ -109,7 +109,7 @@ tokeniseElements input =
 
 tokeniseObject :: String -> (String, [Token])
 tokeniseObject ('{' : '}' : rest) = (rest, LCurly : [RCurly])
-tokeniseObject input = ((drop 1 rest), [LCurly] ++ tokenised ++ [RCurly])
+tokeniseObject input = ((drop 1 (strip rest)), [LCurly] ++ tokenised ++ [RCurly])
   where (rest, tokenised) = tokenise JMembers (drop 1 input)
 
 tokeniseMembers :: String -> (String, [Token])
