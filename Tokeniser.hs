@@ -7,8 +7,11 @@ import Data.String.Utils
 data Exponent = E | EP | EM | LE | LEP | LEM
   deriving (Show, Eq)
 
-data Token = Digit | Minus | Dot | Exp Exponent | KeyChar | ValueChar | Quote | 
-             LSquare | RSquare | Comma | LCurly | RCurly | Colon | T | F | N
+data Constant = T | F | N
+  deriving (Show, Eq)
+
+data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueChar String | Quote | 
+             LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant
   deriving (Show, Eq)
 
 -- Used for the tokenise function
@@ -42,14 +45,16 @@ tokenise JNull         = tokeniseNull . strip
 tokenise JValue        = tokeniseValue . strip
 
 tokeniseDigits :: String -> (String, [Token])
-tokeniseDigits input = (drop nDigits input, take nDigits (repeat Digit))
+tokeniseDigits input = (drop nDigits input, map (Digit . (: [])) (take nDigits input))
   where nDigits = length (takeWhile isDigit input)
 
+-- Minus? Digit+
 tokeniseInt :: String -> (String, [Token])
 tokeniseInt ('-' : input) = (noLeadingDigits, Minus : digits)
   where (noLeadingDigits, digits) = tokenise JDigits input
 tokeniseInt input = tokenise JDigits input
 
+-- SimpleNumber = Int (Dot Digit+)?
 tokeniseSimpleNumber :: String -> (String, [Token])
 tokeniseSimpleNumber input = 
   case noLeadingInt of
@@ -77,22 +82,22 @@ tokeniseNumber input =
     (noExp, exp)                           = tokenise JExp noLeadingSimpleNum
     (noNumber, expDigits)                  = tokenise JDigits noExp
 
-tokeniseString :: Token -> String -> (String, [Token])
+tokeniseString :: (String -> Token) -> String -> (String, [Token])
 tokeniseString _ ('\"' : '\"' : rest) = (rest, Quote : [Quote])
 tokeniseString t ('\"' : rest)        = tokeniseChars' t [] (strip rest)
 tokeniseString t something            = error ("Confused by " ++ something ++ "\n")
 -- String parsing blackbox...
-tokeniseChars' :: Token -> [Token] -> String -> (String, [Token])
+tokeniseChars' :: (String -> Token) -> [Token] -> String -> (String, [Token])
 tokeniseChars' _ acc ('\"' : rest)       = (rest, [Quote] ++ acc ++ [Quote])
 tokeniseChars' t acc ('\\' : 'u' : rest) =
   if all isHexDigit (take 4 rest)
-  then tokeniseChars' t (acc ++ [t]) (drop 4 rest) 
+  then tokeniseChars' t (acc ++ [t ("\\u" ++ (take 4 rest))]) (drop 4 rest) 
   else error "String with bad usage of \\u - expected 4 hex digits - tokenising failed"
 tokeniseChars' t acc ('\\' : c : rest)   =
   if elem c "\"\\/bfnrt"
-  then tokeniseChars' t (acc ++ [t]) rest
+  then tokeniseChars' t (acc ++ [t ("\\" ++ [c])]) rest
   else error "String with bad backslash usage - tokenising failed"
-tokeniseChars' t acc (c : rest)          = tokeniseChars' t (acc ++ [t]) rest
+tokeniseChars' t acc (c : rest)          = tokeniseChars' t (acc ++ [t [c]]) rest
 tokeniseChars' _ acc []                  = ([], acc)
 
 tokeniseArray :: String -> (String, [Token])
@@ -134,13 +139,13 @@ tokenisePair input =
 
 tokeniseBool :: String -> (String, [Token])
 tokeniseBool input
-  | take 4 input == "true"  = (drop 4 input, [T])
-  | take 5 input == "false" = (drop 5 input, [F])
+  | take 4 input == "true"  = (drop 4 input, [Const T])
+  | take 5 input == "false" = (drop 5 input, [Const F])
   | otherwise               = error "Failed to tokenise bool - not true or false"
 
 tokeniseNull :: String -> (String, [Token])
 tokeniseNull input
-  | take 4 input == "null" = (drop 4 input, [N])
+  | take 4 input == "null" = (drop 4 input, [Const N])
   | otherwise              = error "Failed to tokenise null"
 
 tokeniseValue :: String -> (String, [Token])
