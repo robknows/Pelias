@@ -16,7 +16,8 @@ data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString 
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
 
 tokens :: GrammarPart -> String -> [Token]
-tokens jsonPart = snd . (tokenise jsonPart)
+tokens _        ""   = [] 
+tokens jsonPart json = snd (tokenise jsonPart json)
 
 -- The "tokenise" functions, take the String, tokenise what they are meant to
 --   and return the remainder of the input and the tokens they gleaned.
