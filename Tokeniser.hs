@@ -76,7 +76,7 @@ tokeniseInt ('-' : input) = (noLeadingDigits, Minus : digits)
   where (noLeadingDigits, digits) = tokenise JDigits input
 tokeniseInt input = tokenise JDigits input
 
--- SimpleNumber = Int (Dot Digit+)?
+-- Int (Dot Digit+)?
 tokeniseSimpleNumber :: String -> (String, [Token])
 tokeniseSimpleNumber input = 
   case noLeadingInt of
@@ -94,6 +94,7 @@ tokeniseExp ('e' : '+' : rest) = (rest, [Exp LEP])
 tokeniseExp ('e' : '-' : rest) = (rest, [Exp LEM])
 tokeniseExp ('e'       : rest) = (rest, [Exp LE])
 
+-- SimpleNum (Exp Digit+)?
 tokeniseNumber :: String -> (String, [Token])
 tokeniseNumber input =
   if check JExp noLeadingSimpleNum
@@ -108,7 +109,6 @@ tokeniseString :: (String -> Token) -> String -> (String, [Token])
 tokeniseString _ ('\"' : '\"' : rest) = (rest, Quote : [Quote])
 tokeniseString t ('\"' : rest)        = tokeniseChars' t [] (strip rest)
 tokeniseString t something            = error ("Confused by " ++ something ++ "\n")
--- String parsing blackbox...
 tokeniseChars' :: (String -> Token) -> [Token] -> String -> (String, [Token])
 tokeniseChars' _ acc ('\"' : rest)       = (rest, [Quote] ++ acc ++ [Quote])
 tokeniseChars' t acc ('\\' : 'u' : rest) =
