@@ -7,12 +7,12 @@ import Data.String.Utils
 data Exponent = E | EP | EM | LE | LEP | LEM
   deriving (Show, Eq)
 
-data Token = Digit | Minus | Dot | Exp Exponent | Chr | Quote | 
+data Token = Digit | Minus | Dot | Exp Exponent | KeyChar | ValueChar | Quote | 
              LSquare | RSquare | Comma | LCurly | RCurly | Colon | T | F | N
   deriving (Show, Eq)
 
 -- Used for the tokenise function
-data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JString |
+data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString | JValueString |
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
 
 tokens :: GrammarPart -> String -> [Token]
@@ -29,7 +29,8 @@ tokenise JInt          = tokeniseInt . strip
 tokenise JSimpleNumber = tokeniseSimpleNumber . strip
 tokenise JExp          = tokeniseExp . strip
 tokenise JNumber       = tokeniseNumber . strip
-tokenise JString       = tokeniseString . strip
+tokenise JKeyString    = (tokeniseString KeyChar) . strip
+tokenise JValueString  = (tokeniseString ValueChar) . strip
 tokenise JArray        = tokeniseArray . strip
 tokenise JElements     = tokeniseElements . strip
 tokenise JObject       = tokeniseObject . strip
@@ -75,23 +76,23 @@ tokeniseNumber input =
     (noExp, exp)                           = tokenise JExp noLeadingSimpleNum
     (noNumber, expDigits)                  = tokenise JDigits noExp
 
-tokeniseString :: String -> (String, [Token])
-tokeniseString ('\"' : '\"' : rest) = (rest, Quote : [Quote])
-tokeniseString ('\"' : rest)        = tokeniseChars' [] (strip rest)
-tokeniseString something            = error ("Confused by " ++ something ++ "\n")
+tokeniseString :: Token -> String -> (String, [Token])
+tokeniseString _ ('\"' : '\"' : rest) = (rest, Quote : [Quote])
+tokeniseString t ('\"' : rest)        = tokeniseChars' t [] (strip rest)
+tokeniseString t something            = error ("Confused by " ++ something ++ "\n")
 -- String parsing blackbox...
-tokeniseChars' :: [Token] -> String -> (String, [Token])
-tokeniseChars' acc ('\"' : rest)       = (rest, [Quote] ++ acc ++ [Quote])
-tokeniseChars' acc ('\\' : 'u' : rest) =
+tokeniseChars' :: Token -> [Token] -> String -> (String, [Token])
+tokeniseChars' _ acc ('\"' : rest)       = (rest, [Quote] ++ acc ++ [Quote])
+tokeniseChars' t acc ('\\' : 'u' : rest) =
   if all isHexDigit (take 4 rest)
-  then tokeniseChars' (acc ++ [Chr]) (drop 4 rest) 
+  then tokeniseChars' t (acc ++ [t]) (drop 4 rest) 
   else error "String with bad usage of \\u - expected 4 hex digits - tokenising failed"
-tokeniseChars' acc ('\\' : c : rest)   =
+tokeniseChars' t acc ('\\' : c : rest)   =
   if elem c "\"\\/bfnrt"
-  then tokeniseChars' (acc ++ [Chr]) rest
+  then tokeniseChars' t (acc ++ [t]) rest
   else error "String with bad backslash usage - tokenising failed"
-tokeniseChars' acc (c : rest)          = tokeniseChars' (acc ++ [Chr]) rest
-tokeniseChars' acc []                  = ([], acc)
+tokeniseChars' t acc (c : rest)          = tokeniseChars' t (acc ++ [t]) rest
+tokeniseChars' _ acc []                  = ([], acc)
 
 tokeniseArray :: String -> (String, [Token])
 tokeniseArray ('[' : ']' : rest) = (rest, LSquare : [RSquare])
@@ -127,7 +128,7 @@ tokenisePair input =
   then (noPair, key ++ [Colon] ++ value)
   else error "Bad pair - tokenising failed"
   where
-    (noKey, key)    = tokenise JString input
+    (noKey, key)    = tokenise JKeyString input
     (noPair, value) = tokenise JValue (drop 1 (strip noKey))
 
 tokeniseBool :: String -> (String, [Token])
@@ -143,25 +144,25 @@ tokeniseNull input
 
 tokeniseValue :: String -> (String, [Token])
 tokeniseValue input
-  | check JDigits input = tokenise JNumber input
-  | check JString input = tokenise JString input
-  | check JBool   input = tokenise JBool   input
-  | check JNull   input = tokenise JNull   input
-  | check JArray  input = tokenise JArray  input
-  | check JObject input = tokenise JObject input
-  | otherwise         = error ("Tokenising failed, couldn't understand " ++ (take 30 input) ++ "...")
+  | check JDigits input      = tokenise JNumber input
+  | check JValueString input = tokenise JValueString input
+  | check JBool   input      = tokenise JBool   input
+  | check JNull   input      = tokenise JNull   input
+  | check JArray  input      = tokenise JArray  input
+  | check JObject input      = tokenise JObject input
+  | otherwise                = error ("Tokenising failed, couldn't understand " ++ (take 30 input) ++ "...")
 
 -- The "check" functions return true if it is able to tokenise the next tokens
 --   according to the specified member of the grammar.
 
 check :: GrammarPart -> String -> Bool
-check JDigits = checkDigits . strip
-check JExp    = checkExp . strip
-check JString = checkString . strip
-check JBool   = checkBool . strip
-check JNull   = checkNull . strip
-check JArray  = checkArray . strip
-check JObject = checkObject . strip
+check JDigits      = checkDigits . strip
+check JExp         = checkExp . strip
+check JValueString = checkString . strip
+check JBool        = checkBool . strip
+check JNull        = checkNull . strip
+check JArray       = checkArray . strip
+check JObject      = checkObject . strip
 
 checkDigits :: String -> Bool
 checkDigits = isDigit . head

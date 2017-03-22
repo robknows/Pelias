@@ -65,25 +65,25 @@ tests = [
     (tokens JNumber "-5.1E+65")
     [Minus, Digit, Dot, Digit, Exp EP, Digit, Digit],
   
-  -- String
+  -- Normal (Value) String
   makeTest "tokenising empty string"
-    (tokens JString "\"\"")
+    (tokens JValueString "\"\"")
     [Quote, Quote],
   makeTest "tokenising easy string"
-    (tokens JString "\"hi\"")
-    [Quote, Chr, Chr, Quote],
+    (tokens JValueString "\"hi\"")
+    [Quote, ValueChar, ValueChar, Quote],
   makeTest "tokenising string with quote inside it"
-    (tokens JString "\"yo\\\"yo\\\"\"")
-    [Quote, Chr, Chr, Chr, Chr, Chr, Chr, Quote],
+    (tokens JValueString "\"yo\\\"yo\\\"\"")
+    [Quote, ValueChar, ValueChar, ValueChar, ValueChar, ValueChar, ValueChar, Quote],
   makeTest "tokenising string with many quotes inside it"
-    (tokens JString "\"a\\\"b\\\"cd\"")
-    [Quote, Chr, Chr, Chr, Chr, Chr, Chr, Quote],
+    (tokens JValueString "\"a\\\"b\\\"cd\"")
+    [Quote, ValueChar, ValueChar, ValueChar, ValueChar, ValueChar, ValueChar, Quote],
   makeTest "tokenising string with a hex literal"
-    (tokens JString "\"HEX:\\ua32f\"")
-    [Quote, Chr, Chr, Chr, Chr, Chr, Quote],
+    (tokens JValueString "\"HEX:\\ua32f\"")
+    [Quote, ValueChar, ValueChar, ValueChar, ValueChar, ValueChar, Quote],
   makeTest "tokenising string with escaped things"
-    (tokens JString "\"ayy\\b\\rlm\\f\\nao\\t\"")
-    ([Quote] ++ (take 12 (repeat Chr)) ++ [Quote]),
+    (tokens JValueString "\"ayy\\b\\rlm\\f\\nao\\t\"")
+    ([Quote] ++ (take 12 (repeat ValueChar)) ++ [Quote]),
   
   -- Bool
   makeTest "tokenising true"
@@ -101,27 +101,31 @@ tests = [
   -- Pair
   makeTest "tokenising a pair"
     (tokens JPair "\"memes\":420e+247")
-    [Quote, Chr, Chr, Chr, Chr, Chr, Quote, Colon, Digit, Digit, Digit, Exp LEP, Digit, Digit, Digit],
+    [Quote, KeyChar, KeyChar, KeyChar, KeyChar, KeyChar, Quote, Colon, Digit, Digit, Digit, Exp LEP, Digit, Digit, Digit],
   makeTest "tokenising a pair whose value is a bool"
     (tokens JPair "\"admin\":false")
-    [Quote, Chr, Chr, Chr, Chr, Chr, Quote, Colon, F],
+    [Quote, KeyChar, KeyChar, KeyChar, KeyChar, KeyChar, Quote, Colon, F],
   makeTest "tokenising a pair whose value is an empty array"
     (tokens JPair "\"willsPals\":[]")
-    [Quote, Chr, Chr, Chr, Chr, Chr, Chr, Chr, Chr, Chr, Quote, Colon, LSquare, RSquare],
-    
+    [Quote, KeyChar, KeyChar, KeyChar, KeyChar, KeyChar, KeyChar, KeyChar, KeyChar, KeyChar, Quote, Colon, LSquare, RSquare],
+  makeTest "tokenising a pair whose value is a string"
+    (tokens JPair "\"ayy\":\"lmao\"")
+    [Quote, KeyChar, KeyChar, KeyChar, Quote, Colon, Quote, ValueChar, ValueChar, ValueChar, ValueChar, Quote],
+  
+  
   -- Object
   makeTest "tokenising an empty object"
     (tokens JObject "{}")
     [LCurly, RCurly],
   makeTest "tokenising an object with one pair"
     (tokens JObject "{\"x\":\"d\"}")
-    [LCurly, Quote, Chr, Quote, Colon, Quote, Chr, Quote, RCurly],
+    [LCurly, Quote, KeyChar, Quote, Colon, Quote, ValueChar, Quote, RCurly],
   makeTest "tokenising an object with a few pairs of different types"
     (tokens JObject "{\"x\":22.5E-7,\"name\":\"buddha\",\"stuff\":[],\"t\":true}")
-    [LCurly, Quote, Chr, Quote, Colon, Digit, Digit, Dot, Digit, Exp EM, Digit, Comma, Quote, Chr, Chr, Chr, Chr, Quote, Colon, Quote, Chr, Chr, Chr, Chr, Chr, Chr, Quote, Comma, Quote, Chr, Chr, Chr, Chr, Chr, Quote, Colon, LSquare, RSquare, Comma, Quote, Chr, Quote, Colon, T, RCurly],
+    [LCurly, Quote, KeyChar, Quote, Colon, Digit, Digit, Dot, Digit, Exp EM, Digit, Comma, Quote, KeyChar, KeyChar, KeyChar, KeyChar, Quote, Colon, Quote, ValueChar, ValueChar, ValueChar, ValueChar, ValueChar, ValueChar, Quote, Comma, Quote, KeyChar, KeyChar, KeyChar, KeyChar, KeyChar, Quote, Colon, LSquare, RSquare, Comma, Quote, KeyChar, Quote, Colon, T, RCurly],
   makeTest "tokenising a  big object with lots of whitespace and multiple layers of nesting"
     (tokens JObject "{\"menu\":{\"id\" : \"file\",\n\t\"value\" : \"File\",\n\t\"popup\" : {\"menuitem\" : [1 , 2 ,3, 4]}\n\t}\n}")
-    [LCurly,Quote,Chr,Chr,Chr,Chr,Quote,Colon,LCurly,Quote,Chr,Chr,Quote,Colon,Quote,Chr,Chr,Chr,Chr,Quote,Comma,Quote,Chr,Chr,Chr,Chr,Chr,Quote,Colon,Quote,Chr,Chr,Chr,Chr,Quote,Comma,Quote,Chr,Chr,Chr,Chr,Chr,Quote,Colon,LCurly,Quote,Chr,Chr,Chr,Chr,Chr,Chr,Chr,Chr,Quote,Colon,LSquare,Digit,Comma,Digit,Comma,Digit,Comma,Digit,RSquare,RCurly,RCurly,RCurly],
+    [LCurly,Quote,KeyChar,KeyChar,KeyChar,KeyChar,Quote,Colon,LCurly,Quote,KeyChar,KeyChar,Quote,Colon,Quote,ValueChar,ValueChar,ValueChar,ValueChar,Quote,Comma,Quote,KeyChar,KeyChar,KeyChar,KeyChar,KeyChar,Quote,Colon,Quote,ValueChar,ValueChar,ValueChar,ValueChar,Quote,Comma,Quote,KeyChar,KeyChar,KeyChar,KeyChar,KeyChar,Quote,Colon,LCurly,Quote,KeyChar,KeyChar,KeyChar,KeyChar,KeyChar,KeyChar,KeyChar,KeyChar,Quote,Colon,LSquare,Digit,Comma,Digit,Comma,Digit,Comma,Digit,RSquare,RCurly,RCurly,RCurly],
   
   -- Array
   makeTest "tokenising an empty array"
@@ -129,9 +133,9 @@ tests = [
     [LSquare, RSquare],
   makeTest "tokenising an array with one thing"
     (tokens JArray "[\"x\"]")
-    [LSquare, Quote, Chr, Quote, RSquare],
+    [LSquare, Quote, ValueChar, Quote, RSquare],
   makeTest "tokenising an array with a few things"
     (tokens JArray "[{\"key\":true,\"code\":0099}, null, {}]")
-    [LSquare, LCurly, Quote, Chr, Chr, Chr, Quote, Colon, T, Comma, Quote, Chr, Chr, Chr, Chr, Quote, Colon, Digit, Digit, Digit, Digit, RCurly, Comma, N, Comma, LCurly, RCurly, RSquare]
+    [LSquare, LCurly, Quote, KeyChar, KeyChar, KeyChar, Quote, Colon, T, Comma, Quote, KeyChar, KeyChar, KeyChar, KeyChar, Quote, Colon, Digit, Digit, Digit, Digit, RCurly, Comma, N, Comma, LCurly, RCurly, RSquare]
   
         ]

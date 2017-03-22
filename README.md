@@ -6,7 +6,7 @@ file that you can chuck into your project, import and BAM - easy json parsing.
 
 ## Testing
 
-To run the tests, simply run "runghc Test.hs"
+To run the tests, simply run "runghc TokeniserTest.hs"
 
 ## Jibba jabba
 
