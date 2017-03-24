@@ -27,5 +27,8 @@ tests = [
       [StringValue "a"],
   makeTest "reduces value chars"
       (reduce [ValueChar "a", ValueChar "b", ValueChar "c"])
-      [StringValue "abc"]
+      [StringValue "abc"],
+  makeTest "reduces pair"
+      (reduce [KeyChar "a", KeyChar "b", Colon, ValueChar "x", ValueChar "y"])
+      [Key "ab", StringValue "xy"]
         ]

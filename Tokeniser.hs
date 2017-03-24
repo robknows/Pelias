@@ -3,6 +3,9 @@ module Tokeniser where
 import Data.Char
 import Data.String.Utils
 
+data Value = JsonValue Token
+  deriving (Show, Eq)
+
 -- (E) for the letter 'E'. (L)owercase. (P)lus. (M)inus.
 data Exponent = E | EP | EM | LE | LEP | LEM
   deriving (Show, Eq)
@@ -11,7 +14,8 @@ data Constant = T | F | N
   deriving (Show, Eq)
 
 data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueChar String | Quote | 
-             LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant | Key String | StringValue String
+             LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant | Key String | StringValue String |
+             Pair (String, Value)
   deriving (Show, Eq)
 
 -- Used for the tokenise function
@@ -19,11 +23,12 @@ data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString 
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
 
 reduce :: [Token] -> [Token]
-reduce []                     = []
-reduce [KeyChar x]            = [Key x]
-reduce ((KeyChar x) : tokens) = (Key (foldl accumulateString x (takeWhile isChar tokens))) : []
+reduce []                       = []
+reduce [KeyChar x]              = [Key x]
+reduce ((KeyChar x) : tokens)   = (Key (foldl accumulateString x (takeWhile isChar tokens))) : reduce (dropWhile isChar tokens)
 reduce [ValueChar x]            = [StringValue x]
-reduce ((ValueChar x) : tokens) = (StringValue (foldl accumulateString x (takeWhile isChar tokens))) : []
+reduce ((ValueChar x) : tokens) = (StringValue (foldl accumulateString x (takeWhile isChar tokens))) : reduce (dropWhile isChar tokens)
+reduce (Colon : tokens)         = reduce tokens
 
 accumulateString :: String -> Token -> String
 accumulateString acc (KeyChar c)   = acc ++ c
