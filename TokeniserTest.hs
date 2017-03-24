@@ -15,5 +15,8 @@ tests :: [String]
 tests = [
   makeTest "reduces an empty list"
       (reduce [])
-      []
+      [],
+  makeTest "reduces singleton list of key chars"
+      (reduce [KeyChar "x"])
+      [Key "x"]
         ]

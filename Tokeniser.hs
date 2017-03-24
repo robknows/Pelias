@@ -11,7 +11,7 @@ data Constant = T | F | N
   deriving (Show, Eq)
 
 data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueChar String | Quote | 
-             LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant
+             LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant | Key String
   deriving (Show, Eq)
 
 -- Used for the tokenise function
@@ -19,7 +19,8 @@ data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString 
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
 
 reduce :: [Token] -> [Token]
-reduce _ = []
+reduce []          = []
+reduce [KeyChar x] = [Key x]
 
 tokens :: GrammarPart -> String -> [Token]
 tokens _        ""   = [] 
