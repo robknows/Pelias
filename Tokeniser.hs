@@ -11,7 +11,7 @@ data Constant = T | F | N
   deriving (Show, Eq)
 
 data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueChar String | Quote | 
-             LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant | Key String
+             LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant | Key String | StringValue String
   deriving (Show, Eq)
 
 -- Used for the tokenise function
@@ -21,15 +21,22 @@ data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString 
 reduce :: [Token] -> [Token]
 reduce []                     = []
 reduce [KeyChar x]            = [Key x]
-reduce ((KeyChar x) : tokens) = (Key (foldl accumulateKey x (takeWhile isKeyChar tokens))) : []
+reduce ((KeyChar x) : tokens) = (Key (foldl accumulateString x (takeWhile isKeyChar tokens))) : []
+reduce [ValueChar x]            = [StringValue x]
+reduce ((ValueChar x) : tokens) = (StringValue (foldl accumulateString x (takeWhile isValueChar tokens))) : []
 
-accumulateKey :: String -> Token -> String
-accumulateKey acc (KeyChar c) = acc ++ c
-accumulateKey acc _           = acc
+accumulateString :: String -> Token -> String
+accumulateString acc (KeyChar c)   = acc ++ c
+accumulateString acc (ValueChar c) = acc ++ c
+accumulateString acc _             = acc
 
 isKeyChar :: Token -> Bool
 isKeyChar (KeyChar _) = True
 isKeyChar _           = False
+
+isValueChar :: Token -> Bool
+isValueChar (ValueChar _) = True
+isValueChar _             = False
 
 tokens :: GrammarPart -> String -> [Token]
 tokens _        ""   = [] 

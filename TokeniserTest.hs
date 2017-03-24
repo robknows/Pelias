@@ -16,10 +16,16 @@ tests = [
   makeTest "reduces an empty list"
       (reduce [])
       [],
-  makeTest "reduces singleton list of key chars"
+  makeTest "reduces single key char"
       (reduce [KeyChar "x"])
       [Key "x"],
   makeTest "reduces list of key chars"
       (reduce [KeyChar "a", KeyChar "b", KeyChar "c"])
-      [Key "abc"]
+      [Key "abc"],
+  makeTest "reduces single value char"
+      (reduce [ValueChar "a"])
+      [StringValue "a"],
+  makeTest "reduces value chars"
+      (reduce [ValueChar "a", ValueChar "b", ValueChar "c"])
+      [StringValue "abc"]
         ]
