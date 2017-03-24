@@ -18,6 +18,9 @@ data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueC
 data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString | JValueString |
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
 
+reduce :: [Token] -> [Token]
+reduce _ = []
+
 tokens :: GrammarPart -> String -> [Token]
 tokens _        ""   = [] 
 tokens jsonPart json = snd (tokenise jsonPart json)
