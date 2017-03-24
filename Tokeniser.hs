@@ -19,8 +19,17 @@ data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString 
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
 
 reduce :: [Token] -> [Token]
-reduce []          = []
-reduce [KeyChar x] = [Key x]
+reduce []                     = []
+reduce [KeyChar x]            = [Key x]
+reduce ((KeyChar x) : tokens) = (Key (foldl accumulateKey x (takeWhile isKeyChar tokens))) : []
+
+accumulateKey :: String -> Token -> String
+accumulateKey acc (KeyChar c) = acc ++ c
+accumulateKey acc _           = acc
+
+isKeyChar :: Token -> Bool
+isKeyChar (KeyChar _) = True
+isKeyChar _           = False
 
 tokens :: GrammarPart -> String -> [Token]
 tokens _        ""   = [] 

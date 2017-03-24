@@ -18,5 +18,8 @@ tests = [
       [],
   makeTest "reduces singleton list of key chars"
       (reduce [KeyChar "x"])
-      [Key "x"]
+      [Key "x"],
+  makeTest "reduces list of key chars"
+      (reduce [KeyChar "a", KeyChar "b", KeyChar "c"])
+      [Key "abc"]
         ]
