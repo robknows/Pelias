@@ -7,7 +7,7 @@ import RobUnit
 
 main :: IO ()
 main = do
-  putStrLn "=========RUNNING TESTS========="
+  putStrLn "=========REDUCER========="
   (putStr . concat . appendFailedCount) tests
   putStrLn "ALL DONE"
 
