@@ -25,10 +25,19 @@ data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString 
 reduce :: [Token] -> [Token]
 reduce []                       = []
 reduce [KeyChar x]              = [Key x]
-reduce ((KeyChar x) : tokens)   = (Key (foldl accumulateString x (takeWhile isChar tokens))) : reduce (dropWhile isChar tokens)
 reduce [ValueChar x]            = [StringValue x]
-reduce ((ValueChar x) : tokens) = (StringValue (foldl accumulateString x (takeWhile isChar tokens))) : reduce (dropWhile isChar tokens)
+reduce ((KeyChar x) : tokens)   = (reduceString Key         x (takeChars tokens)) : reduce (dropChars tokens)
+reduce ((ValueChar x) : tokens) = (reduceString StringValue x (takeChars tokens)) : reduce (dropChars tokens)
 reduce (Colon : tokens)         = reduce tokens
+
+takeChars :: [Token] -> [Token]
+takeChars = takeWhile isChar
+
+dropChars :: [Token] -> [Token]
+dropChars = dropWhile isChar
+
+reduceString :: (String -> Token) -> String -> [Token] -> Token
+reduceString tokenType initialAcc subsequentTokens = tokenType (foldl accumulateString initialAcc subsequentTokens)
 
 accumulateString :: String -> Token -> String
 accumulateString acc (KeyChar c)   = acc ++ c
