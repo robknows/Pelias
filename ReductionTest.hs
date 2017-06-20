@@ -45,6 +45,9 @@ tests = [
       [Number "23"],
   makeTest "reduces pair"
       (reduce [Key "ab", StringValue "xy"])
-      [Pair ("ab", StringValue "xy")]
+      [Pair ("ab", StringValue "xy")],
+  makeTest "reduces pair"
+      (reduce [Digit "0",Dot,Digit "3",Digit "1"])
+      [Number "0.31"]
   
        ]

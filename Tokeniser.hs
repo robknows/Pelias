@@ -60,6 +60,7 @@ reduceNumber initialAcc subsequentTokens = Number (foldl accumulateNumber initia
 
 accumulateNumber :: String -> Token -> String
 accumulateNumber acc (Digit d) = acc ++ d
+accumulateNumber acc Dot       = acc ++ "."
 accumulateNumber acc _         = acc
 
 takeNumber :: [Token] -> [Token]
@@ -70,6 +71,7 @@ dropNumber = dropWhile isNumeric
 
 isNumeric :: Token -> Bool
 isNumeric (Digit _) = True
+isNumeric Dot       = True
 isNumeric _         = False
 
 tokens :: GrammarPart -> String -> [Token]
