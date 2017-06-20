@@ -12,7 +12,7 @@ data Constant = T | F | N
 
 data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueChar String | Quote | 
              LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant | 
-             Key String | StringValue String | Number String | Pair (String, Token)
+             Key String | StringValue String | Number String | Pair (String, [Token])
   deriving (Show, Eq)
 
 -- Used for the tokenise function
@@ -32,7 +32,7 @@ reduce ((KeyChar k) : tokens)   = (reduceString Key         k  (takeChars tokens
 reduce ((ValueChar v) : tokens) = (reduceString StringValue v  (takeChars tokens)) : reduce (dropChars tokens)
 reduce ((Digit d) : tokens)     = (reduceNumber             d  (takeNumber tokens)) : reduce (dropNumber tokens)
 reduce (Minus : tokens)         = (reduceNumber            "-" (takeNumber tokens)) : reduce (dropNumber tokens)
-reduce (Key k : v : tokens)     = (Pair (k, v)) : reduce tokens
+reduce (Key k : v : tokens)     = (Pair (k, [v])) : reduce tokens
 
 reduceString :: (String -> Token) -> String -> [Token] -> Token
 reduceString tokenType initialAcc subsequentTokens = tokenType (foldl accumulateString initialAcc subsequentTokens)

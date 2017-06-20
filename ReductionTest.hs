@@ -45,7 +45,7 @@ tests = [
       [Number "23"],
   makeTest "reduces pair"
       (reduce [Key "ab", StringValue "xy"])
-      [Pair ("ab", StringValue "xy")],
+      [Pair ("ab", [StringValue "xy"])],
   makeTest "reduces decimal"
       (reduce [Digit "0",Dot,Digit "3",Digit "1"])
       [Number "0.31"],
@@ -60,6 +60,6 @@ tests = [
       [LCurly, Key "k", StringValue "v", Comma, Key "kee", Number "420", RCurly],
   makeTest "reduce two pairs"
       (reduce [LCurly, Key "k", StringValue "v", Comma, Key "kee", Number "420", RCurly])
-      [LCurly, Pair ("k", StringValue "v"), Comma, Pair ("kee", Number "420"), RCurly]
+      [LCurly, Pair ("k", [StringValue "v"]), Comma, Pair ("kee", [Number "420"]), RCurly]
   
        ]
