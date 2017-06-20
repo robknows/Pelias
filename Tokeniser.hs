@@ -28,6 +28,9 @@ reduce [KeyChar x]              = [Key x]
 reduce [ValueChar x]            = [StringValue x]
 reduce ((KeyChar x) : tokens)   = (reduceString Key         x (takeChars tokens)) : reduce (dropChars tokens)
 reduce ((ValueChar x) : tokens) = (reduceString StringValue x (takeChars tokens)) : reduce (dropChars tokens)
+reduce (Quote : tokens)         = reduce tokens
+reduce (LCurly : tokens)        = LCurly : reduce tokens
+reduce (RCurly : tokens)        = RCurly : reduce tokens
 reduce (Colon : tokens)         = reduce tokens
 
 takeChars :: [Token] -> [Token]
@@ -53,7 +56,7 @@ tokens :: GrammarPart -> String -> [Token]
 tokens _        ""   = [] 
 tokens jsonPart json = snd (tokenise jsonPart json)
 
--- The "tokenise" functions, take the String, tokenise what they are meant to
+-- The "tokenise" functions take the String, tokenise what they are meant to
 --   and return the remainder of the input and the tokens they gleaned.
 
 -- This is so I don't have to litter my code with strip. Although as I have now
