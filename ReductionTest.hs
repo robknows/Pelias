@@ -42,6 +42,9 @@ tests = [
       [Number "2"],
   makeTest "reduces multi digit integer"
       (reduce [Digit "2", Digit "3"])
-      [Number "23"]
+      [Number "23"],
+  makeTest "reduces pair"
+      (reduce [Key "ab", StringValue "xy"])
+      [Pair ("ab", StringValue "xy")]
   
        ]

@@ -3,9 +3,6 @@ module Tokeniser where
 import Data.Char
 import Data.String.Utils
 
-data Value = JsonValue Token
-  deriving (Show, Eq)
-
 -- (E) for the letter 'E'. (L)owercase. (P)lus. (M)inus.
 data Exponent = E | EP | EM | LE | LEP | LEM
   deriving (Show, Eq)
@@ -15,7 +12,7 @@ data Constant = T | F | N
 
 data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueChar String | Quote | 
              LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant | 
-             Key String | StringValue String | Number String | Pair (String, Value)
+             Key String | StringValue String | Number String | Pair (String, Token)
   deriving (Show, Eq)
 
 -- Used for the tokenise function
@@ -24,16 +21,17 @@ data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString 
 
 reduce :: [Token] -> [Token]
 reduce []                       = []
-reduce [KeyChar x]              = [Key x]
-reduce [ValueChar x]            = [StringValue x]
-reduce ((KeyChar x) : tokens)   = (reduceString Key         x (takeChars tokens)) : reduce (dropChars tokens)
-reduce ((ValueChar x) : tokens) = (reduceString StringValue x (takeChars tokens)) : reduce (dropChars tokens)
-reduce ((Digit d) : tokens)     = (reduceNumber             d (takeNumber tokens)) : reduce (dropNumber tokens)
 reduce (Quote : tokens)         = reduce tokens
 reduce (LCurly : tokens)        = LCurly : reduce tokens
 reduce (RCurly : tokens)        = RCurly : reduce tokens
 reduce (Colon : tokens)         = reduce tokens
 reduce (Comma : tokens)         = Comma : reduce tokens
+reduce [KeyChar x]              = [Key x]
+reduce [ValueChar x]            = [StringValue x]
+reduce ((KeyChar k) : tokens)   = (reduceString Key         k (takeChars tokens)) : reduce (dropChars tokens)
+reduce ((ValueChar v) : tokens) = (reduceString StringValue v (takeChars tokens)) : reduce (dropChars tokens)
+reduce ((Digit d) : tokens)     = (reduceNumber             d (takeNumber tokens)) : reduce (dropNumber tokens)
+reduce (Key k : v : tokens)     = (Pair (k, v)) : reduce tokens
 
 reduceString :: (String -> Token) -> String -> [Token] -> Token
 reduceString tokenType initialAcc subsequentTokens = tokenType (foldl accumulateString initialAcc subsequentTokens)
