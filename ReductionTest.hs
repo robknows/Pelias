@@ -57,6 +57,9 @@ tests = [
       [Number "5e12"],
   makeTest "reduces multipair object"
       (reduce [LCurly,Quote,KeyChar "k",Quote,Colon,Quote,ValueChar "v",Quote,Comma,Quote,KeyChar "k",KeyChar "e",KeyChar "e",Quote,Colon,Digit "4",Digit "2",Digit "0",Quote,RCurly])
-      [LCurly, Key "k", StringValue "v", Comma, Key "kee", Number "420", RCurly]
+      [LCurly, Key "k", StringValue "v", Comma, Key "kee", Number "420", RCurly],
+  makeTest "reduce two pairs"
+      (reduce [LCurly, Key "k", StringValue "v", Comma, Key "kee", Number "420", RCurly])
+      [LCurly, Pair ("k", StringValue "v"), Comma, Pair ("kee", Number "420"), RCurly]
   
        ]
