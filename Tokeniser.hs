@@ -63,6 +63,12 @@ accumulateNumber :: String -> Token -> String
 accumulateNumber acc (Digit d) = acc ++ d
 accumulateNumber acc Dot       = acc ++ "."
 accumulateNumber acc Minus     = acc ++ "-"
+accumulateNumber acc (Exp LE)  = acc ++ "e"
+accumulateNumber acc (Exp LEP)  = acc ++ "e+"
+accumulateNumber acc (Exp LEM)  = acc ++ "e-"
+accumulateNumber acc (Exp E)  = acc ++ "E"
+accumulateNumber acc (Exp EP)  = acc ++ "E+"
+accumulateNumber acc (Exp EM)  = acc ++ "E-"
 accumulateNumber acc _         = acc
 
 takeNumber :: [Token] -> [Token]
@@ -73,6 +79,7 @@ dropNumber = dropWhile isNumeric
 
 isNumeric :: Token -> Bool
 isNumeric (Digit _) = True
+isNumeric (Exp _)   = True
 isNumeric Dot       = True
 isNumeric Minus     = True
 isNumeric _         = False

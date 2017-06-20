@@ -51,6 +51,9 @@ tests = [
       [Number "0.31"],
   makeTest "reduces negative number"
       (reduce [Minus, Digit "0",Dot,Digit "3",Digit "1"])
-      [Number "-0.31"]
+      [Number "-0.31"],
+  makeTest "reduces exponential number"
+      (reduce [Digit "5",Exp LE,Digit "1",Digit "2"])
+      [Number "5e12"]
   
        ]
