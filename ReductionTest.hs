@@ -46,8 +46,11 @@ tests = [
   makeTest "reduces pair"
       (reduce [Key "ab", StringValue "xy"])
       [Pair ("ab", StringValue "xy")],
-  makeTest "reduces pair"
+  makeTest "reduces decimal"
       (reduce [Digit "0",Dot,Digit "3",Digit "1"])
-      [Number "0.31"]
+      [Number "0.31"],
+  makeTest "reduces negative number"
+      (reduce [Minus, Digit "0",Dot,Digit "3",Digit "1"])
+      [Number "-0.31"]
   
        ]

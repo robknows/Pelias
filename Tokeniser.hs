@@ -28,9 +28,10 @@ reduce (Colon : tokens)         = reduce tokens
 reduce (Comma : tokens)         = Comma : reduce tokens
 reduce [KeyChar x]              = [Key x]
 reduce [ValueChar x]            = [StringValue x]
-reduce ((KeyChar k) : tokens)   = (reduceString Key         k (takeChars tokens)) : reduce (dropChars tokens)
-reduce ((ValueChar v) : tokens) = (reduceString StringValue v (takeChars tokens)) : reduce (dropChars tokens)
-reduce ((Digit d) : tokens)     = (reduceNumber             d (takeNumber tokens)) : reduce (dropNumber tokens)
+reduce ((KeyChar k) : tokens)   = (reduceString Key         k  (takeChars tokens)) : reduce (dropChars tokens)
+reduce ((ValueChar v) : tokens) = (reduceString StringValue v  (takeChars tokens)) : reduce (dropChars tokens)
+reduce ((Digit d) : tokens)     = (reduceNumber             d  (takeNumber tokens)) : reduce (dropNumber tokens)
+reduce (Minus : tokens)         = (reduceNumber            "-" (takeNumber tokens)) : reduce (dropNumber tokens)
 reduce (Key k : v : tokens)     = (Pair (k, v)) : reduce tokens
 
 reduceString :: (String -> Token) -> String -> [Token] -> Token
@@ -61,6 +62,7 @@ reduceNumber initialAcc subsequentTokens = Number (foldl accumulateNumber initia
 accumulateNumber :: String -> Token -> String
 accumulateNumber acc (Digit d) = acc ++ d
 accumulateNumber acc Dot       = acc ++ "."
+accumulateNumber acc Minus     = acc ++ "-"
 accumulateNumber acc _         = acc
 
 takeNumber :: [Token] -> [Token]
@@ -72,6 +74,7 @@ dropNumber = dropWhile isNumeric
 isNumeric :: Token -> Bool
 isNumeric (Digit _) = True
 isNumeric Dot       = True
+isNumeric Minus     = True
 isNumeric _         = False
 
 tokens :: GrammarPart -> String -> [Token]
