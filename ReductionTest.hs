@@ -54,6 +54,9 @@ tests = [
       [Number "-0.31"],
   makeTest "reduces exponential number"
       (reduce [Digit "5",Exp LE,Digit "1",Digit "2"])
-      [Number "5e12"]
+      [Number "5e12"],
+  makeTest "reduces multipair object"
+      (reduce [LCurly,Quote,KeyChar "k",Quote,Colon,Quote,ValueChar "v",Quote,Comma,Quote,KeyChar "k",KeyChar "e",KeyChar "e",Quote,Colon,Digit "4",Digit "2",Digit "0",Quote,RCurly])
+      [LCurly, Key "k", StringValue "v", Comma, Key "kee", Number "420", RCurly]
   
        ]
