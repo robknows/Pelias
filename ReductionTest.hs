@@ -36,6 +36,12 @@ tests = [
       [LCurly, Key "ab", StringValue "xy", RCurly],
   makeTest "reduces two-valued object"
       (reduce [LCurly, KeyChar "a", KeyChar "b", Colon, ValueChar "x", ValueChar "y", Comma, KeyChar "k", KeyChar "k", Colon, ValueChar "v", ValueChar "v", ValueChar "v", RCurly])
-      [LCurly, Key "ab", StringValue "xy", Comma, Key "kk", StringValue "vvv", RCurly]
-
-        ]
+      [LCurly, Key "ab", StringValue "xy", Comma, Key "kk", StringValue "vvv", RCurly],
+  makeTest "reduces one digit integer"
+      (reduce [Digit "2"])
+      [Number "2"],
+  makeTest "reduces multi digit integer"
+      (reduce [Digit "2", Digit "3"])
+      [Number "23"]
+  
+       ]

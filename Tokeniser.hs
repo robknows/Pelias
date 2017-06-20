@@ -14,8 +14,8 @@ data Constant = T | F | N
   deriving (Show, Eq)
 
 data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueChar String | Quote | 
-             LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant | Key String | StringValue String |
-             Pair (String, Value)
+             LSquare | RSquare | Comma | LCurly | RCurly | Colon | Const Constant | 
+             Key String | StringValue String | Number String | Pair (String, Value)
   deriving (Show, Eq)
 
 -- Used for the tokenise function
@@ -28,11 +28,23 @@ reduce [KeyChar x]              = [Key x]
 reduce [ValueChar x]            = [StringValue x]
 reduce ((KeyChar x) : tokens)   = (reduceString Key         x (takeChars tokens)) : reduce (dropChars tokens)
 reduce ((ValueChar x) : tokens) = (reduceString StringValue x (takeChars tokens)) : reduce (dropChars tokens)
+reduce ((Digit d) : tokens)     = (reduceNumber             d (takeNumber tokens)) : reduce (dropNumber tokens)
 reduce (Quote : tokens)         = reduce tokens
 reduce (LCurly : tokens)        = LCurly : reduce tokens
 reduce (RCurly : tokens)        = RCurly : reduce tokens
 reduce (Colon : tokens)         = reduce tokens
 reduce (Comma : tokens)         = Comma : reduce tokens
+
+reduceString :: (String -> Token) -> String -> [Token] -> Token
+reduceString tokenType initialAcc subsequentTokens = tokenType (foldl accumulateString initialAcc subsequentTokens)
+
+tokenValue :: Token -> String
+tokenValue (KeyChar c)   = c
+tokenValue (ValueChar c) = c
+tokenValue _             = ""
+
+accumulateString :: String -> Token -> String
+accumulateString acc token = if isChar token then acc ++ tokenValue token else acc
 
 takeChars :: [Token] -> [Token]
 takeChars = takeWhile isChar
@@ -40,18 +52,27 @@ takeChars = takeWhile isChar
 dropChars :: [Token] -> [Token]
 dropChars = dropWhile isChar
 
-reduceString :: (String -> Token) -> String -> [Token] -> Token
-reduceString tokenType initialAcc subsequentTokens = tokenType (foldl accumulateString initialAcc subsequentTokens)
-
-accumulateString :: String -> Token -> String
-accumulateString acc (KeyChar c)   = acc ++ c
-accumulateString acc (ValueChar c) = acc ++ c
-accumulateString acc _             = acc
-
 isChar :: Token -> Bool
 isChar (KeyChar _)   = True
 isChar (ValueChar _) = True
 isChar _             = False
+
+reduceNumber :: String -> [Token] -> Token
+reduceNumber initialAcc subsequentTokens = Number (foldl accumulateNumber initialAcc subsequentTokens)
+
+accumulateNumber :: String -> Token -> String
+accumulateNumber acc (Digit d) = acc ++ d
+accumulateNumber acc _         = acc
+
+takeNumber :: [Token] -> [Token]
+takeNumber = takeWhile isNumeric
+
+dropNumber :: [Token] -> [Token]
+dropNumber = dropWhile isNumeric
+
+isNumeric :: Token -> Bool
+isNumeric (Digit _) = True
+isNumeric _         = False
 
 tokens :: GrammarPart -> String -> [Token]
 tokens _        ""   = [] 
