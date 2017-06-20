@@ -32,6 +32,7 @@ reduce (Quote : tokens)         = reduce tokens
 reduce (LCurly : tokens)        = LCurly : reduce tokens
 reduce (RCurly : tokens)        = RCurly : reduce tokens
 reduce (Colon : tokens)         = reduce tokens
+reduce (Comma : tokens)         = Comma : reduce tokens
 
 takeChars :: [Token] -> [Token]
 takeChars = takeWhile isChar

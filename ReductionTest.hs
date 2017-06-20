@@ -30,5 +30,12 @@ tests = [
       [StringValue "abc"],
   makeTest "reduces pair"
       (reduce [KeyChar "a", KeyChar "b", Colon, ValueChar "x", ValueChar "y"])
-      [Key "ab", StringValue "xy"]
+      [Key "ab", StringValue "xy"],
+  makeTest "reduces one-valued object"
+      (reduce [LCurly, KeyChar "a", KeyChar "b", Colon, ValueChar "x", ValueChar "y", RCurly])
+      [LCurly, Key "ab", StringValue "xy", RCurly],
+  makeTest "reduces two-valued object"
+      (reduce [LCurly, KeyChar "a", KeyChar "b", Colon, ValueChar "x", ValueChar "y", Comma, KeyChar "k", KeyChar "k", Colon, ValueChar "v", ValueChar "v", ValueChar "v", RCurly])
+      [LCurly, Key "ab", StringValue "xy", Comma, Key "kk", StringValue "vvv", RCurly]
+
         ]
