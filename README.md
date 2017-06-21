@@ -18,11 +18,17 @@ cabal install MissingH
 
 parse :: String -> Maybe Value
 
+
 type :: Value -> JSONType
 
+
 retrieveString :: Value -> Maybe String
+
 retrieveNumber :: Value -> Maybe Float
+
 retrieveBool   :: Value -> Maybe Bool
 
+
 castObject :: Value -> Maybe [(String, Value)]
+
 castArray  :: Value -> Maybe [Value]
