@@ -36,10 +36,21 @@ evaluate (LSquare : tokens) = AValue (evaluateArray $ init tokens)
 evaluate []                 = error "evaluate: Given empty list of tokens"
 
 evaluatePairs :: [Token] -> [(String, Value)]
-evaluatePairs = undefined
+evaluatePairs []                         = []
+evaluatePairs (LCurly : tokens)          = evaluatePairs tokens
+evaluatePairs (RCurly : tokens)          = evaluatePairs tokens
+evaluatePairs (Comma : tokens)           = evaluatePairs tokens
+evaluatePairs ((Pair (k, [t])) : tokens) = (k, evaluate [t]) : evaluatePairs tokens
+evaluatePairs ((Pair (k, ts))  : tokens) = (k, evaluate ts) : evaluatePairs tokens
 
 evaluateArray :: [Token] -> [Value]
-evaluateArray = undefined
+evaluateArray []                       = []
+evaluateArray (StringValue s : tokens) = (SValue s) : evaluateArray tokens
+evaluateArray (Number n      : tokens) = (NValue n) : evaluateArray tokens
+evaluateArray (Const T       : tokens) = (BValue T) : evaluateArray tokens
+evaluateArray (Const F       : tokens) = (BValue F) : evaluateArray tokens
+evaluateArray (Const N       : tokens) = NullValue  : evaluateArray tokens
+
 
 converge :: Eq a => (a -> a) -> a -> a
 converge = until =<< ((==) =<<)

@@ -3,8 +3,6 @@ module APITest where
 import Parser
 import RobUnit
 
--- Todo: Use quickcheck
-
 main :: IO ()
 main = do
   putStrLn "=========API========="
@@ -14,8 +12,24 @@ main = do
 tests :: [String]
 tests = [
 
-  makeTest "can evaluate object"
-      (evaluate [LCurly, Pair ("k", [StringValue "v"]), Comma, Pair ("kee", [Number "420"]), Comma, Pair ("xd", [Const T]), RCurly])
-      (OValue [("k", SValue "v"), ("kee", NValue "420"), ("xd", BValue T)])
-        
+  makeTest "can evaluate empty object"
+      (evaluate [LCurly,RCurly])
+      (OValue []),
+  makeTest "can evaluate object with one string value"
+      (evaluate [LCurly, Pair ("key", [StringValue "value"]), RCurly])
+      (OValue [("key", SValue "value")]),
+  makeTest "can evaluate object with two values of different types"
+      (evaluate [LCurly, Pair ("key", [StringValue "value"]), Comma, Pair ("num", [Number "15"]), RCurly])
+      (OValue [("key", SValue "value"), ("num", NValue "15")]),
+  makeTest "can evaluate object with an array value of unit cardinality"
+      (evaluate [LCurly, Pair ("key", [LSquare, StringValue "value", RSquare]), RCurly])
+      (OValue [("key", AValue [SValue "value"])]),
+  makeTest "can evaluate object with an empty array value"
+      (evaluate [LCurly, Pair ("key", [LSquare, RSquare]), RCurly])
+      (OValue [("key", AValue [])]),
+  makeTest "can evaluate object with an array value with many elements of different type"
+      (evaluate [LCurly, Pair ("key", [LSquare, StringValue "val", Number "12", Const T, Const F, Const N, RSquare]), RCurly])
+      (OValue [("key", AValue [SValue "val", NValue "12", BValue T, BValue F, NullValue])])
+  
+  
         ]
