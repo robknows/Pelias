@@ -61,7 +61,10 @@ reduceTests = [
       [LCurly, Key "k", StringValue "v", Comma, Key "kee", Number "420", RCurly],
   makeTest "reduce two pairs"
       (reduce [LCurly, Key "k", StringValue "v", Comma, Key "kee", Number "420", RCurly])
-      [LCurly, Pair ("k", [StringValue "v"]), Comma, Pair ("kee", [Number "420"]), RCurly]
+      [LCurly, Pair ("k", [StringValue "v"]), Comma, Pair ("kee", [Number "420"]), RCurly],
+  makeTest "reduce number array"
+      (reduce [LSquare,Number "1",Comma,Number "2",Comma,Number "3",RSquare])
+      [LSquare,Number "1",Comma,Number "2",Comma,Number "3",RSquare]
   
               ]
 
@@ -71,5 +74,5 @@ tokensTests = [
   makeTest "reduces multipair object"
       (tokens JObject "{\"k\":\"v\",\"kee\":420}")
       [LCurly, Pair ("k", [StringValue "v"]), Comma, Pair ("kee", [Number "420"]), RCurly]
-              
+
               ]

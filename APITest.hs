@@ -8,7 +8,7 @@ import RobUnit
 main :: IO ()
 main = do
   putStrLn "=========API========="
-  (putStr . concat . appendFailedCount) tests
+  -- (putStr . concat . appendFailedCount) tests
   putStrLn "ALL DONE"
 
 tests :: [String]

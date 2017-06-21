@@ -30,8 +30,8 @@ evaluate [Number n]         = NValue n
 evaluate [Const T]          = BValue T
 evaluate [Const F]          = BValue F
 evaluate [Const N]          = NullValue
-evaluate (LCurly  : tokens) = OValue (evaluatePairs tokens)
-evaluate (LSquare : tokens) = AValue (evaluateArray tokens)
+evaluate (LCurly  : tokens) = OValue (evaluatePairs $ init tokens)
+evaluate (LSquare : tokens) = AValue (evaluateArray $ init tokens)
 evaluate []                 = error "evaluate: Given empty list of tokens"
 
 evaluatePairs :: [Token] -> [(String, Value)]
