@@ -1,11 +1,11 @@
-module APITest where
+module EvalTest where
 
 import Parser
 import RobUnit
 
 main :: IO ()
 main = do
-  putStrLn "=========API========="
+  putStrLn "=========EVALUATION========="
   (putStr . concat . appendFailedCount) tests
   putStrLn "ALL DONE"
 
