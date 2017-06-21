@@ -33,8 +33,11 @@ tests = [
   makeTest "can evaluate a 2D array with one empty element"
       (evaluate [LSquare, LSquare, RSquare, RSquare])
       (AValue [AValue []]),
- makeTest "can evaluate a 2D array with one non-empty element"
+  makeTest "can evaluate a 2D array with one non-empty element"
       (evaluate [LSquare, LSquare, Number "7", RSquare, RSquare])
-      (AValue [AValue [NValue "7"]])
+      (AValue [AValue [NValue "7"]]),
+  makeTest "can evaluate a 2D array with two elements, where the first is non-empty"
+      (evaluate [LSquare, LSquare, Number "7", RSquare, LSquare, RSquare, RSquare])
+      (AValue [AValue [NValue "7"], AValue []])
  
         ]
