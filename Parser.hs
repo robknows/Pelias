@@ -68,14 +68,18 @@ reduce (token : tokens)            = token : reduce tokens
 
 -- Refactor take/drop array/object to have less duplication
 
-takeArray :: [Token] -> [Token]
-takeArray = takeArray' 0 []
+takeParenthesis :: Token -> Token -> [Token] -> [Token]
+takeParenthesis lb rb = takeParenthesis' 0 lb rb [] 
 
-takeArray' :: Int -> [Token] -> [Token] -> [Token]
-takeArray' 0 acc (RSquare : tokens) = [LSquare] ++ acc ++ [RSquare]
-takeArray' x acc (RSquare : tokens) = takeArray' (x - 1) (acc ++ [RSquare]) tokens
-takeArray' x acc (LSquare : tokens) = takeArray' (x + 1) (acc ++ [LSquare]) tokens
-takeArray' x acc (t       : tokens) = takeArray' x       (acc ++ [t]) tokens
+takeParenthesis' :: Int -> Token -> Token -> [Token] -> [Token] -> [Token]
+takeParenthesis' x lb rb acc (t : tokens) = 
+  if x == 0 && t == rb then [lb] ++ acc ++ [rb] else
+  if t == rb then takeParenthesis' (x - 1) lb rb (acc ++ [rb]) tokens else
+  if t == lb then takeParenthesis' (x + 1) lb rb (acc ++ [lb]) tokens else
+  takeParenthesis' x lb rb (acc ++ [t]) tokens
+
+takeArray :: [Token] -> [Token]
+takeArray = takeParenthesis LSquare RSquare
 
 dropArray :: [Token] -> [Token]
 dropArray = dropArray' 0
@@ -87,13 +91,7 @@ dropArray' x (LSquare : tokens) = dropArray' (x + 1) tokens
 dropArray' x (t       : tokens) = dropArray' x       tokens
 
 takeObject :: [Token] -> [Token]
-takeObject = takeObject' 0 []
-
-takeObject' :: Int -> [Token] -> [Token] -> [Token]
-takeObject' 0 acc (RCurly : tokens) = [LCurly] ++ acc ++ [RCurly]
-takeObject' x acc (RCurly : tokens) = takeObject' (x - 1) (acc ++ [RCurly]) tokens
-takeObject' x acc (LCurly : tokens) = takeObject' (x + 1) (acc ++ [LCurly]) tokens
-takeObject' x acc (t      : tokens) = takeObject' x       (acc ++ [t]) tokens
+takeObject = takeParenthesis LCurly RCurly
 
 dropObject :: [Token] -> [Token]
 dropObject = dropObject' 0
