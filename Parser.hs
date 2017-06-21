@@ -45,6 +45,7 @@ evaluatePairs ((Pair (k, ts))  : tokens) = (k, evaluate ts)  : evaluatePairs tok
 
 evaluateArrayContents :: [Token] -> [Value]
 evaluateArrayContents []                       = []
+evaluateArrayContents (Comma         : tokens) = evaluateArrayContents tokens
 evaluateArrayContents (StringValue s : tokens) = (SValue s) : evaluateArrayContents tokens
 evaluateArrayContents (Number n      : tokens) = (NValue n) : evaluateArrayContents tokens
 evaluateArrayContents (Const T       : tokens) = (BValue T) : evaluateArrayContents tokens
