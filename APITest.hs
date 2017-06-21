@@ -27,9 +27,11 @@ tests = [
   makeTest "can evaluate object with an empty array value"
       (evaluate [LCurly, Pair ("key", [LSquare, RSquare]), RCurly])
       (OValue [("key", AValue [])]),
-  makeTest "can evaluate object with an array value with many elements of different type"
+  makeTest "can evaluate object with an array value with many elements of different types"
       (evaluate [LCurly, Pair ("key", [LSquare, StringValue "val", Number "12", Const T, Const F, Const N, RSquare]), RCurly])
-      (OValue [("key", AValue [SValue "val", NValue "12", BValue T, BValue F, NullValue])])
-  
-  
+      (OValue [("key", AValue [SValue "val", NValue "12", BValue T, BValue F, NullValue])]),
+  makeTest "can evaluate a 2D array with one empty element"
+      (evaluate [LSquare, LSquare, RSquare, RSquare])
+      (AValue [AValue []])
+
         ]

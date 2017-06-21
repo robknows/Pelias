@@ -31,26 +31,27 @@ evaluate [Number n]         = NValue n
 evaluate [Const T]          = BValue T
 evaluate [Const F]          = BValue F
 evaluate [Const N]          = NullValue
-evaluate (LCurly  : tokens) = OValue (evaluatePairs $ init tokens)
-evaluate (LSquare : tokens) = AValue (evaluateArray $ init tokens)
+evaluate (LCurly  : tokens) = OValue (evaluatePairs tokens)
+evaluate (LSquare : tokens) = AValue (evaluateArrayContents (init tokens))
 evaluate []                 = error "evaluate: Given empty list of tokens"
 
 evaluatePairs :: [Token] -> [(String, Value)]
 evaluatePairs []                         = []
 evaluatePairs (LCurly : tokens)          = evaluatePairs tokens
 evaluatePairs (RCurly : tokens)          = evaluatePairs tokens
-evaluatePairs (Comma : tokens)           = evaluatePairs tokens
+evaluatePairs (Comma  : tokens)          = evaluatePairs tokens
 evaluatePairs ((Pair (k, [t])) : tokens) = (k, evaluate [t]) : evaluatePairs tokens
-evaluatePairs ((Pair (k, ts))  : tokens) = (k, evaluate ts) : evaluatePairs tokens
+evaluatePairs ((Pair (k, ts))  : tokens) = (k, evaluate ts)  : evaluatePairs tokens
 
-evaluateArray :: [Token] -> [Value]
-evaluateArray []                       = []
-evaluateArray (StringValue s : tokens) = (SValue s) : evaluateArray tokens
-evaluateArray (Number n      : tokens) = (NValue n) : evaluateArray tokens
-evaluateArray (Const T       : tokens) = (BValue T) : evaluateArray tokens
-evaluateArray (Const F       : tokens) = (BValue F) : evaluateArray tokens
-evaluateArray (Const N       : tokens) = NullValue  : evaluateArray tokens
-
+evaluateArrayContents :: [Token] -> [Value]
+evaluateArrayContents []                       = []
+evaluateArrayContents (StringValue s : tokens) = (SValue s) : evaluateArrayContents tokens
+evaluateArrayContents (Number n      : tokens) = (NValue n) : evaluateArrayContents tokens
+evaluateArrayContents (Const T       : tokens) = (BValue T) : evaluateArrayContents tokens
+evaluateArrayContents (Const F       : tokens) = (BValue F) : evaluateArrayContents tokens
+evaluateArrayContents (Const N       : tokens) = NullValue  : evaluateArrayContents tokens
+evaluateArrayContents [LSquare, RSquare]       = [AValue []]
+evaluateArrayContents (LSquare       : tokens) = undefined
 
 converge :: Eq a => (a -> a) -> a -> a
 converge = until =<< ((==) =<<)
@@ -81,7 +82,8 @@ takeParenthesis :: Token -> Token -> [Token] -> [Token]
 takeParenthesis lb rb = takeParenthesis' 0 lb rb [] 
 
 takeParenthesis' :: Int -> Token -> Token -> [Token] -> [Token] -> [Token]
-takeParenthesis' x lb rb acc (t : tokens) = 
+takeParenthesis' x lb rb acc []           = []
+takeParenthesis' x lb rb acc (t : tokens) =
   if x == 0 && t == rb then [lb] ++ acc ++ [rb] else
   if t == rb then takeParenthesis' (x - 1) lb rb (acc ++ [rb]) tokens else
   if t == lb then takeParenthesis' (x + 1) lb rb (acc ++ [lb]) tokens else
@@ -91,21 +93,26 @@ dropParenthesis :: Token -> Token -> [Token] -> [Token]
 dropParenthesis lb rb = dropParenthesis' 0 lb rb
 
 dropParenthesis' :: Int -> Token -> Token -> [Token] -> [Token]
-dropParenthesis' x lb rb (t : tokens) = 
+dropParenthesis' x lb rb []           = []
+dropParenthesis' x lb rb (t : tokens) =
   if x == 0 && t == rb then tokens else
   if t == rb then dropParenthesis' (x - 1) lb rb tokens else
   if t == lb then dropParenthesis' (x + 1) lb rb tokens else
   dropParenthesis' x lb rb tokens
 
+-- Don't give it the LSquare
 takeArray :: [Token] -> [Token]
 takeArray = takeParenthesis LSquare RSquare
 
+-- Don't give it the LSquare
 dropArray :: [Token] -> [Token]
 dropArray = dropParenthesis LSquare RSquare
 
+-- Don't give it the LCurly
 takeObject :: [Token] -> [Token]
 takeObject = takeParenthesis LCurly RCurly
 
+-- Don't give it the LCurly
 dropObject :: [Token] -> [Token]
 dropObject = dropParenthesis LCurly RCurly
 
@@ -139,9 +146,9 @@ accumulateNumber acc (Digit d) = acc ++ d
 accumulateNumber acc Dot       = acc ++ "."
 accumulateNumber acc Minus     = acc ++ "-"
 accumulateNumber acc (Exp LE)  = acc ++ "e"
-accumulateNumber acc (Exp LEP)  = acc ++ "e+"
-accumulateNumber acc (Exp LEM)  = acc ++ "e-"
-accumulateNumber acc (Exp E)  = acc ++ "E"
+accumulateNumber acc (Exp LEP) = acc ++ "e+"
+accumulateNumber acc (Exp LEM) = acc ++ "e-"
+accumulateNumber acc (Exp E)   = acc ++ "E"
 accumulateNumber acc (Exp EP)  = acc ++ "E+"
 accumulateNumber acc (Exp EM)  = acc ++ "E-"
 accumulateNumber acc _         = acc
