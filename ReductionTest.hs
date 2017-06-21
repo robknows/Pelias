@@ -8,11 +8,12 @@ import RobUnit
 main :: IO ()
 main = do
   putStrLn "=========REDUCER========="
-  (putStr . concat . appendFailedCount) tests
+  (putStr . concat . appendFailedCount) (reduceTests ++ tokensTests)
   putStrLn "ALL DONE"
 
-tests :: [String]
-tests = [
+reduceTests :: [String]
+reduceTests = [
+
   makeTest "reduces an empty list"
       (reduce [])
       [],
@@ -62,4 +63,14 @@ tests = [
       (reduce [LCurly, Key "k", StringValue "v", Comma, Key "kee", Number "420", RCurly])
       [LCurly, Pair ("k", [StringValue "v"]), Comma, Pair ("kee", [Number "420"]), RCurly]
   
-       ]
+              ]
+
+tokensTests :: [String]
+tokensTests = [
+
+  makeTest "reduces multipair object"
+      (tokens JObject "{\"k\":\"v\",\"kee\":420}")
+      [LCurly, Pair ("k", [StringValue "v"]), Comma, Pair ("kee", [Number "420"]), RCurly]
+              
+              ]
+  
