@@ -70,7 +70,7 @@ takeObject = takeObject' 0 []
 
 takeObject' :: Int -> [Token] -> [Token] -> [Token]
 takeObject' x acc (LCurly : tokens) = takeObject' (x + 1) (acc ++ [LCurly]) tokens
-takeObject' 0 acc (RCurly : tokens) = LCurly : acc ++ [RCurly]
+takeObject' 0 acc (RCurly : tokens) = [LCurly] ++ acc ++ [RCurly]
 takeObject' x acc (RCurly : tokens) = takeObject' (x - 1) (acc ++ [RCurly]) tokens
 takeObject' x acc (t      : tokens) = takeObject' x       (acc ++ [t]) tokens
 

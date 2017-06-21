@@ -7,7 +7,7 @@ It is my intention that this works as a single file that you can chuck into your
 
 To run the tests, simply run "./run-tests.sh"
 
-## Jibba jabba
+## Required haskell libs
 
 ```
 cabal update
