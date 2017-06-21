@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-runghc ReductionTest.hs
 runghc TokeniserIndividualPartsTest.hs
+runghc ReductionTest.hs
+runghc APITest.hs

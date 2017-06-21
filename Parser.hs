@@ -1,4 +1,4 @@
-module Tokeniser where
+module Parser where
 
 import Data.Char
 import Data.String.Utils
@@ -19,6 +19,26 @@ data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueC
 -- Used for the tokenise function
 data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString | JValueString |
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
+
+data Value = SValue String | NValue String | BValue Constant | NullValue |
+             OValue [(String, Value)] | AValue [Value]
+  deriving (Show, Eq)
+
+evaluate :: [Token] -> Value
+evaluate [StringValue s]    = SValue s
+evaluate [Number n]         = NValue n
+evaluate [Const T]          = BValue T
+evaluate [Const F]          = BValue F
+evaluate [Const N]          = NullValue
+evaluate (LCurly  : tokens) = OValue (evaluatePairs tokens)
+evaluate (LSquare : tokens) = AValue (evaluateArray tokens)
+evaluate []                 = error "evaluate: Given empty list of tokens"
+
+evaluatePairs :: [Token] -> [(String, Value)]
+evaluatePairs = undefined
+
+evaluateArray :: [Token] -> [Value]
+evaluateArray = undefined
 
 converge :: Eq a => (a -> a) -> a -> a
 converge = until =<< ((==) =<<)

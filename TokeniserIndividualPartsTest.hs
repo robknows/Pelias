@@ -1,6 +1,6 @@
 module TokeniserTest where
 
-import Tokeniser
+import Parser
 import RobUnit
 
 -- Todo: Use quickcheck

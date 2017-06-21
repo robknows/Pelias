@@ -1,6 +1,6 @@
-module TokeniserTest where
+module ReductionTest where
 
-import Tokeniser
+import Parser
 import RobUnit
 
 -- Todo: Use quickcheck
@@ -73,4 +73,3 @@ tokensTests = [
       [LCurly, Pair ("k", [StringValue "v"]), Comma, Pair ("kee", [Number "420"]), RCurly]
               
               ]
-  
