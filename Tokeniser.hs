@@ -7,6 +7,7 @@ import Data.String.Utils
 data Exponent = E | EP | EM | LE | LEP | LEM
   deriving (Show, Eq)
 
+-- True. False. Null
 data Constant = T | F | N
   deriving (Show, Eq)
 
@@ -18,6 +19,13 @@ data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueC
 -- Used for the tokenise function
 data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString | JValueString |
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
+
+converge :: Eq a => (a -> a) -> a -> a
+converge = until =<< ((==) =<<)
+
+tokens :: GrammarPart -> String -> [Token]
+tokens _        ""   = []
+tokens jsonPart json = ((converge reduce) . (snd . (tokenise jsonPart))) json
 
 reduce :: [Token] -> [Token]
 reduce []                       = []
@@ -33,6 +41,7 @@ reduce ((ValueChar v) : tokens) = (reduceString StringValue v  (takeChars tokens
 reduce ((Digit d) : tokens)     = (reduceNumber             d  (takeNumber tokens)) : reduce (dropNumber tokens)
 reduce (Minus : tokens)         = (reduceNumber            "-" (takeNumber tokens)) : reduce (dropNumber tokens)
 reduce (Key k : v : tokens)     = (Pair (k, [v])) : reduce tokens
+reduce (token : tokens)         = token : reduce tokens
 
 reduceString :: (String -> Token) -> String -> [Token] -> Token
 reduceString tokenType initialAcc subsequentTokens = tokenType (foldl accumulateString initialAcc subsequentTokens)
@@ -83,10 +92,6 @@ isNumeric (Exp _)   = True
 isNumeric Dot       = True
 isNumeric Minus     = True
 isNumeric _         = False
-
-tokens :: GrammarPart -> String -> [Token]
-tokens _        ""   = [] 
-tokens jsonPart json = snd (tokenise jsonPart json)
 
 -- The "tokenise" functions take the String, tokenise what they are meant to
 --   and return the remainder of the input and the tokens they gleaned.
