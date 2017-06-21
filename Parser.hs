@@ -50,8 +50,12 @@ evaluateArrayContents (Number n      : tokens) = (NValue n) : evaluateArrayConte
 evaluateArrayContents (Const T       : tokens) = (BValue T) : evaluateArrayContents tokens
 evaluateArrayContents (Const F       : tokens) = (BValue F) : evaluateArrayContents tokens
 evaluateArrayContents (Const N       : tokens) = NullValue  : evaluateArrayContents tokens
+evaluateArrayContents (LCurly        : tokens) =
+  case dropObject tokens of
+    []   -> [OValue (evaluatePairs $ init tokens)]
+    rest -> (OValue $ evaluatePairs $ takeObject tokens) : (evaluateArrayContents rest)
 evaluateArrayContents (LSquare       : tokens) = 
-  case dropArray $ tokens of
+  case dropArray tokens of
     []    -> [AValue (evaluateArrayContents $ init tokens)]
     rest  -> (evaluateArrayContents $ takeArray tokens) ++ (evaluateArrayContents rest)
 
