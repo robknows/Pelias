@@ -49,38 +49,59 @@ tokens _        ""   = []
 tokens jsonPart json = ((converge reduce) . (snd . (tokenise jsonPart))) json
 
 reduce :: [Token] -> [Token]
-reduce []                        = []
-reduce (Quote : tokens)          = reduce tokens
-reduce (LCurly : tokens)         = LCurly : reduce tokens
-reduce (RCurly : tokens)         = RCurly : reduce tokens
-reduce (Colon : tokens)          = reduce tokens
-reduce (Comma : tokens)          = Comma : reduce tokens
-reduce [KeyChar x]               = [Key x]
-reduce [ValueChar x]             = [StringValue x]
-reduce ((KeyChar k) : tokens)    = (reduceString Key         k  (takeChars tokens)) : reduce (dropChars tokens)
-reduce ((ValueChar v) : tokens)  = (reduceString StringValue v  (takeChars tokens)) : reduce (dropChars tokens)
-reduce ((Digit d) : tokens)      = (reduceNumber             d  (takeNumber tokens)) : reduce (dropNumber tokens)
-reduce (Minus : tokens)          = (reduceNumber            "-" (takeNumber tokens)) : reduce (dropNumber tokens)
-reduce (Key k : LCurly : tokens) = (Pair (k, reduce (takeObject tokens))) : reduce (dropObject tokens)
-reduce (Key k : v : tokens)      = (Pair (k, [v])) : reduce tokens
-reduce (token : tokens)          = token : reduce tokens
+reduce []                          = []
+reduce (Quote  : tokens)           = reduce tokens
+reduce (LCurly : tokens)           = LCurly : reduce tokens
+reduce (RCurly : tokens)           = RCurly : reduce tokens
+reduce (Colon  : tokens)           = reduce tokens
+reduce (Comma  : tokens)           = Comma : reduce tokens
+reduce [KeyChar x]                 = [Key x]
+reduce [ValueChar x]               = [StringValue x]
+reduce ((KeyChar k)   : tokens)    = (reduceString Key         k  (takeChars tokens)) : reduce (dropChars tokens)
+reduce ((ValueChar v) : tokens)    = (reduceString StringValue v  (takeChars tokens)) : reduce (dropChars tokens)
+reduce ((Digit d)     : tokens)    = (reduceNumber             d  (takeNumber tokens)) : reduce (dropNumber tokens)
+reduce (Minus : tokens)            = (reduceNumber            "-" (takeNumber tokens)) : reduce (dropNumber tokens)
+reduce (Key k : LCurly  : tokens)  = (Pair (k, reduce (takeObject tokens))) : reduce (dropObject tokens)
+reduce (Key k : LSquare : tokens)  = (Pair (k, reduce (takeArray  tokens))) : reduce (dropArray tokens)
+reduce (Key k : v : tokens)        = (Pair (k, [v])) : reduce tokens
+reduce (token : tokens)            = token : reduce tokens
+
+-- Refactor take/drop array/object to have less duplication
+
+takeArray :: [Token] -> [Token]
+takeArray = takeArray' 0 []
+
+takeArray' :: Int -> [Token] -> [Token] -> [Token]
+takeArray' 0 acc (RSquare : tokens) = [LSquare] ++ acc ++ [RSquare]
+takeArray' x acc (RSquare : tokens) = takeArray' (x - 1) (acc ++ [RSquare]) tokens
+takeArray' x acc (LSquare : tokens) = takeArray' (x + 1) (acc ++ [LSquare]) tokens
+takeArray' x acc (t       : tokens) = takeArray' x       (acc ++ [t]) tokens
+
+dropArray :: [Token] -> [Token]
+dropArray = dropArray' 0
+
+dropArray' :: Int -> [Token] -> [Token]
+dropArray' 0 (RSquare : tokens) = tokens
+dropArray' x (RSquare : tokens) = dropArray' (x - 1) tokens
+dropArray' x (LSquare : tokens) = dropArray' (x + 1) tokens
+dropArray' x (t       : tokens) = dropArray' x       tokens
 
 takeObject :: [Token] -> [Token]
 takeObject = takeObject' 0 []
 
 takeObject' :: Int -> [Token] -> [Token] -> [Token]
-takeObject' x acc (LCurly : tokens) = takeObject' (x + 1) (acc ++ [LCurly]) tokens
 takeObject' 0 acc (RCurly : tokens) = [LCurly] ++ acc ++ [RCurly]
 takeObject' x acc (RCurly : tokens) = takeObject' (x - 1) (acc ++ [RCurly]) tokens
+takeObject' x acc (LCurly : tokens) = takeObject' (x + 1) (acc ++ [LCurly]) tokens
 takeObject' x acc (t      : tokens) = takeObject' x       (acc ++ [t]) tokens
 
 dropObject :: [Token] -> [Token]
 dropObject = dropObject' 0
 
 dropObject' :: Int -> [Token] -> [Token]
-dropObject' x (LCurly : tokens) = dropObject' (x + 1) tokens
 dropObject' 0 (RCurly : tokens) = tokens
 dropObject' x (RCurly : tokens) = dropObject' (x - 1) tokens
+dropObject' x (LCurly : tokens) = dropObject' (x + 1) tokens
 dropObject' x (t      : tokens) = dropObject' x       tokens
 
 reduceString :: (String -> Token) -> String -> [Token] -> Token
@@ -282,7 +303,8 @@ check JArray       = checkArray . strip
 check JObject      = checkObject . strip
 
 checkDigits :: String -> Bool
-checkDigits = isDigit . head
+checkDigits []              = False
+checkDigits (firstChar : _) = isDigit firstChar || '-' == firstChar
 
 checkExp :: String -> Bool
 checkExp ('e':'+':rest) = checkDigits rest

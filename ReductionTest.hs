@@ -91,7 +91,10 @@ reduceTests = [
       [LSquare,Number "2",RSquare],
   makeTest "reduce array of two items"
       (reduce [LSquare,Number "25.1",Comma,Number "-0.1e+2",RSquare])
-      [LSquare,Number "25.1",Comma,Number "-0.1e+2",RSquare]
+      [LSquare,Number "25.1",Comma,Number "-0.1e+2",RSquare],
+  makeTest "reduce object with array as a value"
+      (reduce [LCurly,Key "nums", LSquare, Number "1",Comma,Number "-2",Comma,Number "30",Comma,Number "0.123E-94",RSquare,RCurly])
+      [LCurly, Pair ("nums", [LSquare,Number "1",Comma,Number "-2",Comma,Number "30",Comma,Number "0.123E-94",RSquare]), RCurly]
   
               ]
 
