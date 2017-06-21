@@ -65,6 +65,9 @@ reduceTests = [
   makeTest "reduce number array"
       (reduce [LSquare,Number "1",Comma,Number "2",Comma,Number "3",RSquare])
       [LSquare,Number "1",Comma,Number "2",Comma,Number "3",RSquare],
+  makeTest "reduce empty object"
+      (reduce [LCurly,RCurly])
+      [LCurly,RCurly],
   makeTest "reduce object with object as a value"
       (reduce [LCurly,Key "k",LCurly,Key "key2",Const N,RCurly,RCurly])
       [LCurly,Pair ("k",[LCurly, Pair ("key2",[Const N]), RCurly]),RCurly],
@@ -79,7 +82,16 @@ reduceTests = [
       [LCurly,Pair ("k",[LCurly, Pair ("key1",[Const N]), Comma, Pair ("key2", [Const T]), RCurly]),Comma,Pair ("ayy", [LCurly, RCurly]),Comma,Pair ("xd", [Number "32"]),RCurly],
   makeTest "reduce object with double nested object as field"
       (reduce [LCurly,Key "k",LCurly,Key "key1",Const N,Comma,Key "key2", LCurly, Key "kk", Const T, RCurly,RCurly,RCurly])
-      [LCurly,Pair ("k",[LCurly, Pair ("key1",[Const N]), Comma, Pair ("key2", [LCurly,Pair ("kk",[Const T]), RCurly]), RCurly]),RCurly]
+      [LCurly,Pair ("k",[LCurly, Pair ("key1",[Const N]), Comma, Pair ("key2", [LCurly,Pair ("kk",[Const T]), RCurly]), RCurly]),RCurly],
+  makeTest "reduce empty array"
+      (reduce [LSquare,RSquare])
+      [LSquare,RSquare],
+  makeTest "reduce array of one item"
+      (reduce [LSquare,Number "2",RSquare])
+      [LSquare,Number "2",RSquare],
+  makeTest "reduce array of two items"
+      (reduce [LSquare,Number "25.1",Comma,Number "-0.1e+2",RSquare])
+      [LSquare,Number "25.1",Comma,Number "-0.1e+2",RSquare]
   
               ]
 
