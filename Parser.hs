@@ -19,6 +19,7 @@ data Token = Digit String | Minus | Dot | Exp Exponent | KeyChar String | ValueC
 -- Used for the tokenise function
 data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString | JValueString |
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
+  deriving (Show, Eq)
 
 data Value = SValue String | NValue String | BValue Constant | NullValue |
              OValue [(String, Value)] | AValue [Value]
