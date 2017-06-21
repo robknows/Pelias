@@ -32,6 +32,9 @@ tests = [
       (OValue [("key", AValue [SValue "val", NValue "12", BValue T, BValue F, NullValue])]),
   makeTest "can evaluate a 2D array with one empty element"
       (evaluate [LSquare, LSquare, RSquare, RSquare])
-      (AValue [AValue []])
-
+      (AValue [AValue []]),
+ makeTest "can evaluate a 2D array with one non-empty element"
+      (evaluate [LSquare, LSquare, Number "7", RSquare, RSquare])
+      (AValue [AValue [NValue "7"]])
+ 
         ]

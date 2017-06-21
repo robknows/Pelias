@@ -50,8 +50,7 @@ evaluateArrayContents (Number n      : tokens) = (NValue n) : evaluateArrayConte
 evaluateArrayContents (Const T       : tokens) = (BValue T) : evaluateArrayContents tokens
 evaluateArrayContents (Const F       : tokens) = (BValue F) : evaluateArrayContents tokens
 evaluateArrayContents (Const N       : tokens) = NullValue  : evaluateArrayContents tokens
-evaluateArrayContents [LSquare, RSquare]       = [AValue []]
-evaluateArrayContents (LSquare       : tokens) = undefined
+evaluateArrayContents (LSquare       : tokens) = [AValue (evaluateArrayContents $ init tokens)]
 
 converge :: Eq a => (a -> a) -> a -> a
 converge = until =<< ((==) =<<)
