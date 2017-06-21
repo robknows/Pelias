@@ -78,29 +78,27 @@ takeParenthesis' x lb rb acc (t : tokens) =
   if t == lb then takeParenthesis' (x + 1) lb rb (acc ++ [lb]) tokens else
   takeParenthesis' x lb rb (acc ++ [t]) tokens
 
+dropParenthesis :: Token -> Token -> [Token] -> [Token]
+dropParenthesis lb rb = dropParenthesis' 0 lb rb
+
+dropParenthesis' :: Int -> Token -> Token -> [Token] -> [Token]
+dropParenthesis' x lb rb (t : tokens) = 
+  if x == 0 && t == rb then tokens else
+  if t == rb then dropParenthesis' (x - 1) lb rb tokens else
+  if t == lb then dropParenthesis' (x + 1) lb rb tokens else
+  dropParenthesis' x lb rb tokens
+
 takeArray :: [Token] -> [Token]
 takeArray = takeParenthesis LSquare RSquare
 
 dropArray :: [Token] -> [Token]
-dropArray = dropArray' 0
-
-dropArray' :: Int -> [Token] -> [Token]
-dropArray' 0 (RSquare : tokens) = tokens
-dropArray' x (RSquare : tokens) = dropArray' (x - 1) tokens
-dropArray' x (LSquare : tokens) = dropArray' (x + 1) tokens
-dropArray' x (t       : tokens) = dropArray' x       tokens
+dropArray = dropParenthesis LSquare RSquare
 
 takeObject :: [Token] -> [Token]
 takeObject = takeParenthesis LCurly RCurly
 
 dropObject :: [Token] -> [Token]
-dropObject = dropObject' 0
-
-dropObject' :: Int -> [Token] -> [Token]
-dropObject' 0 (RCurly : tokens) = tokens
-dropObject' x (RCurly : tokens) = dropObject' (x - 1) tokens
-dropObject' x (LCurly : tokens) = dropObject' (x + 1) tokens
-dropObject' x (t      : tokens) = dropObject' x       tokens
+dropObject = dropParenthesis LCurly RCurly
 
 reduceString :: (String -> Token) -> String -> [Token] -> Token
 reduceString tokenType initialAcc subsequentTokens = tokenType (foldl accumulateString initialAcc subsequentTokens)
