@@ -36,8 +36,8 @@ evaluate [Const T]          = BValue T
 evaluate [Const F]          = BValue F
 evaluate [Const N]          = NullValue
 
-evaluate [Comma]            = SValue ""
 -- THIS IS A HORRIBLE BUGFIX --
+evaluate [Comma]            = SValue ""
 -- Because "reduce" strips quotes and colons - assignments to
 --   empty strings like "abc" in this example become:
 --                before "123" >> abc , << after "456"
