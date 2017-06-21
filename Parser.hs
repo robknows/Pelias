@@ -66,8 +66,6 @@ reduce (Key k : LSquare : tokens)  = (Pair (k, reduce (takeArray  tokens))) : re
 reduce (Key k : v : tokens)        = (Pair (k, [v])) : reduce tokens
 reduce (token : tokens)            = token : reduce tokens
 
--- Refactor take/drop array/object to have less duplication
-
 takeParenthesis :: Token -> Token -> [Token] -> [Token]
 takeParenthesis lb rb = takeParenthesis' 0 lb rb [] 
 
