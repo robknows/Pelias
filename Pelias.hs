@@ -1,4 +1,4 @@
-module Parser where
+module Pelias where
 
 import Data.Char
 import Data.String.Utils

@@ -1,6 +1,6 @@
 module EvalTest where
 
-import Parser
+import Pelias
 import RobUnit
 
 main :: IO ()

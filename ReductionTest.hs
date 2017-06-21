@@ -1,6 +1,6 @@
 module ReductionTest where
 
-import Parser
+import Pelias
 import RobUnit
 
 -- Todo: Use quickcheck
