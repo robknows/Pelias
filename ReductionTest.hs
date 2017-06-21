@@ -67,7 +67,19 @@ reduceTests = [
       [LSquare,Number "1",Comma,Number "2",Comma,Number "3",RSquare],
   makeTest "reduce object with object as a value"
       (reduce [LCurly,Key "k",LCurly,Key "key2",Const N,RCurly,RCurly])
-      [LCurly,Pair ("k",[LCurly, Pair ("key2",[Const N]), RCurly]),RCurly]
+      [LCurly,Pair ("k",[LCurly, Pair ("key2",[Const N]), RCurly]),RCurly],
+  makeTest "reduce object with object as a value and another field"
+      (reduce [LCurly,Key "k",LCurly,Key "key2",Const N,RCurly,Comma,Key "xd",Number "32",RCurly])
+      [LCurly,Pair ("k",[LCurly, Pair ("key2",[Const N]), RCurly]),Comma,Pair ("xd", [Number "32"]),RCurly],
+  makeTest "reduce object with object as a value, another field, then an empty object"
+      (reduce [LCurly,Key "k",LCurly,Key "key2",Const N,RCurly,Comma,Key "xd",Number "32",Comma,Key "ayy",LCurly,RCurly,RCurly])
+      [LCurly,Pair ("k",[LCurly, Pair ("key2",[Const N]), RCurly]),Comma,Pair ("xd", [Number "32"]), Comma, Pair ("ayy", [LCurly, RCurly]),RCurly],
+  makeTest "reduce object with nested object with two fields and some other fields too"
+      (reduce [LCurly,Key "k",LCurly,Key "key1",Const N,Comma,Key "key2", Const T,RCurly,Comma,Key "ayy",LCurly,RCurly,Comma,Key "xd",Number "32",RCurly])
+      [LCurly,Pair ("k",[LCurly, Pair ("key1",[Const N]), Comma, Pair ("key2", [Const T]), RCurly]),Comma,Pair ("ayy", [LCurly, RCurly]),Comma,Pair ("xd", [Number "32"]),RCurly],
+  makeTest "reduce object with double nested object as field"
+      (reduce [LCurly,Key "k",LCurly,Key "key1",Const N,Comma,Key "key2", LCurly, Key "kk", Const T, RCurly,RCurly,RCurly])
+      [LCurly,Pair ("k",[LCurly, Pair ("key1",[Const N]), Comma, Pair ("key2", [LCurly,Pair ("kk",[Const T]), RCurly]), RCurly]),RCurly]
   
               ]
 
