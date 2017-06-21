@@ -64,7 +64,10 @@ reduceTests = [
       [LCurly, Pair ("k", [StringValue "v"]), Comma, Pair ("kee", [Number "420"]), RCurly],
   makeTest "reduce number array"
       (reduce [LSquare,Number "1",Comma,Number "2",Comma,Number "3",RSquare])
-      [LSquare,Number "1",Comma,Number "2",Comma,Number "3",RSquare]
+      [LSquare,Number "1",Comma,Number "2",Comma,Number "3",RSquare],
+  makeTest "reduce object with object as a value"
+      (reduce [LCurly,Key "k",LCurly,Key "key2",Const N,RCurly,RCurly])
+      [LCurly,Pair ("k",[LCurly, Pair ("key2",[Const N]), RCurly]),RCurly]
   
               ]
 
