@@ -2,3 +2,4 @@
 runghc TokeniserIndividualPartsTest.hs
 runghc ReductionTest.hs
 runghc EvalTest.hs
+runghc EndToEndTest.hs

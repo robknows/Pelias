@@ -25,15 +25,28 @@ data Value = SValue String | NValue String | BValue Constant | NullValue |
              OValue [(String, Value)] | AValue [Value]
   deriving (Show, Eq)
 
+parse :: String -> Value
+parse ('{' : json) = (evaluate . (tokens JObject)) ('{' : json)
+parse ('[' : json) = (evaluate . (tokens JArray))  ('[' : json)
+
 evaluate :: [Token] -> Value
 evaluate [StringValue s]    = SValue s
 evaluate [Number n]         = NValue n
 evaluate [Const T]          = BValue T
 evaluate [Const F]          = BValue F
 evaluate [Const N]          = NullValue
+
+evaluate [Comma]            = SValue ""
+-- THIS IS A HORRIBLE BUGFIX --
+-- Because "reduce" strips quotes and colons - assignments to
+--   empty strings like "abc" in this example become:
+--                before "123" >> abc , << after "456"
+-- And so during pairing it becomes:
+--                ("abc", [Comma])
+-- Which leads us here.
+
 evaluate (LCurly  : tokens) = OValue (evaluatePairs tokens)
 evaluate (LSquare : tokens) = AValue (evaluateArrayContents (init tokens))
-evaluate []                 = error "evaluate: Given empty list of tokens"
 
 evaluatePairs :: [Token] -> [(String, Value)]
 evaluatePairs []                         = []
