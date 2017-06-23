@@ -52,6 +52,7 @@ optimiseInput (Index i : ops) json = (reform $ (substr start end) splitJSON, ops
     indexItemRange x = (length . takeWhile (< (1 + 2 * x))) bracketMap
     bracketMap       = scanl (+) 0 $ (map (succ . countStrBalance)) $ (drop 2) $ splitJSON
     (start, end)     = (indexItemRange i, indexItemRange (i + 1))
+optimiseInput ops json = (json, ops)
 
 countStrBalance :: String -> Int
 countStrBalance = countStrBalance' 1

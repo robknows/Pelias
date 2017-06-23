@@ -9,20 +9,24 @@ main = do
   (putStr . concat . appendFailedCount) tests
   putStrLn "ALL DONE"
 
+-- Disable optimisations
+parser :: [JSONOperation] -> String -> Maybe Value
+parser ops = (extractValue ops) . parse . removeNewlinesAndTabs
+
 tests :: [String]
 tests = [
 
   makeTest "extract with no operations just parses the whole thing"
-      (extract [] "{\"key\":\"value\"}")
+      (parser [] "{\"key\":\"value\"}")
       (Just $ OValue [("key", SValue "value")]),
   makeTest "get a key from an object"
-      (extract [Get "key"] "{\"key\":\"value\"}")
+      (parser [Get "key"] "{\"key\":\"value\"}")
       (Just $ SValue "value"),
   makeTest "get a value from an array"
-      (extract [Index 0] "[\"key\",\"value\"]")
+      (parser [Index 0] "[\"key\",\"value\"]")
       (Just $ SValue "key"),
   makeTest "apply a get then an index"
-      (extract [Get "key", Index 1] "{\"key\":[\"v0\", \"v1\", \"v2\"]}")
+      (parser [Get "key", Index 1] "{\"key\":[\"v0\", \"v1\", \"v2\"]}")
       (Just $ SValue "v1")
   
         ]
