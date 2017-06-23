@@ -37,12 +37,15 @@ optimiseInput :: [JSONOperation] -> String -> String
 optimiseInput ops = id
 
 extractValue :: [JSONOperation] -> Value -> Maybe Value
-extractValue [] json                           = Just json
-extractValue (Index i   : ops) (AValue values) = if i < length values then extractValue ops (values!!i) else Nothing
-extractValue (Get field : ops) (OValue pairs)  = 
-  case lookup field pairs of
-    Just  v -> extractValue ops v
+extractValue []         json = Just json
+extractValue (op : ops) json = 
+  case applyOperation op json of
+    Just v  -> extractValue ops v
     Nothing -> Nothing
+
+applyOperation :: JSONOperation -> Value -> Maybe Value
+applyOperation (Index i)   (AValue values) = if i < length values then Just (values !! i) else Nothing
+applyOperation (Get field) (OValue pairs)  = lookup field pairs
 
 parse :: String -> Value
 parse ('{' : json) = (evaluate . (tokens JObject)) ('{' : json)
