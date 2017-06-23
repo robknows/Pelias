@@ -14,18 +14,41 @@ cabal update
 cabal install MissingH
 ```
 
-## Desired API
+# Desired API
 
-parse :: String -> Maybe Value
+It is my intention that this is as simple as possible and gets directly to
+what the user wants to do when using a json parser - extract information from
+json of known structure.
 
-jsonType :: Value -> JSONType
+JSON Arrays are implemented as a list of values.
 
-retrieveString :: Value -> Maybe String
+JSON Objects are implemented as a list of key/value pairs.
 
-retrieveNumber :: Value -> Maybe Float
+Everything else is totally obvious (although I'd like to think the above two are obvious too).
 
-retrieveBool   :: Value -> Maybe Bool
+## Function
 
-castObject :: Value -> Maybe [(String, Value)]
+extract :: [JSONOperation] -> String -> Maybe Value
 
-castArray  :: Value -> Maybe [Value]
+  Applies the series of operations on the json to narrow down to the
+  information you want.
+
+## Types
+
+### Value:
+
+AValue [Value] (arrays)
+
+OValue [(String, Value)] (objects)
+
+SValue String (strings)
+
+NValue String (numbers)
+
+BValue Bool (bools)
+
+NullValue (null)
+
+## Usage
+
+Gimme a few days ok
