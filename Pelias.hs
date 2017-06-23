@@ -30,20 +30,44 @@ data JSONOperation = Index Int | Get String
   deriving (Show, Eq)
 
 extract :: [JSONOperation] -> String -> Maybe Value
-extract ops = (extractValue ops) . parse . (prepareInput ops)
+extract ops json = (extractValue remainingOps) $ parse result
+  where
+    (result, remainingOps) = prepareInput ops json
 
 removeNewlinesAndTabs :: String -> String
 removeNewlinesAndTabs = concat . (map strip) . lines
 
-prepareInput :: [JSONOperation] -> String -> String
+prepareInput :: [JSONOperation] -> String -> (String, [JSONOperation])
 prepareInput ops = (optimiseInput ops) . removeNewlinesAndTabs
 
-optimiseInput :: [JSONOperation] -> String -> String
-optimiseInput ops = id
+optimiseInput :: [JSONOperation] -> String -> (String, [JSONOperation])
+optimiseInput (Index i : ops) json = (reform $ (substr start end) splitJSON, ops)
+  where
+    splitJSON        = (split "{") json
+    substr :: Int -> Int -> [a] -> [a]
+    substr s e       = (drop s) . (take e)
+    reform :: [String] -> String
+    reform           = concat . (map (\x -> '{' : x))
+    indexItemRange :: Int -> Int
+    indexItemRange x = (length . takeWhile (< (1 + 2 * x))) bracketMap
+    bracketMap       = scanl (+) 0 $ (map (succ . countStrBalance)) $ (drop 2) $ splitJSON
+    (start, end)     = (indexItemRange i, indexItemRange (i + 1))
+
+countStrBalance :: String -> Int
+countStrBalance = countStrBalance' 1
+
+countStrBalance' :: Int -> String -> Int
+countStrBalance' _ ""                   = 0
+countStrBalance' x ('\"' : rest)        = countStrBalance' (1 - x) rest
+countStrBalance' 0 (_    : rest)        = countStrBalance' 0 rest
+countStrBalance' x ('\\' : '\"' : rest) = countStrBalance' x rest
+countStrBalance' x ('{'  : rest)        = x    + countStrBalance' x rest
+countStrBalance' x ('}'  : rest)        = (-x) + countStrBalance' x rest
+countStrBalance' x (_    : rest)        = countStrBalance' x rest
 
 extractValue :: [JSONOperation] -> Value -> Maybe Value
 extractValue []         json = Just json
-extractValue (op : ops) json = 
+extractValue (op : ops) json =
   case applyOperation op json of
     Just v  -> extractValue ops v
     Nothing -> Nothing
