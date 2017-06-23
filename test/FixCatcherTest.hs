@@ -1,4 +1,4 @@
-module EndToEndTest where
+module FixCatcherTest where
 
 import Pelias
 import RobUnit
@@ -10,7 +10,7 @@ main = do
   (AValue values) <- pure $ parse json
   len             <- pure $ length values
 
-  putStrLn "=========END TO END========="
+  putStrLn "=========FIX CATCHER========="
   (putStr . concat . appendFailedCount) (tests ++ [makeTest "array of many large objects" len 6])
   putStrLn "ALL DONE"
 
