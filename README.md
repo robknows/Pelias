@@ -14,7 +14,7 @@ cabal update
 cabal install MissingH
 ```
 
-# Desired API
+# API
 
 It is my intention that this is as simple as possible and gets directly to
 what the user wants to do when using a json parser - extract information from
@@ -24,14 +24,7 @@ JSON Arrays are implemented as a list of values.
 
 JSON Objects are implemented as a list of key/value pairs.
 
-Everything else is totally obvious (although I'd like to think the above two are obvious too).
-
-## Function
-
-extract :: [JSONOperation] -> String -> Maybe Value
-
-  Applies the series of operations on the json to narrow down to the
-  information you want.
+Other values are totally obvious and intuitive
 
 ## Types
 
