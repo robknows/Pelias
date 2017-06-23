@@ -44,8 +44,9 @@ extractValue (op : ops) json =
     Nothing -> Nothing
 
 applyOperation :: JSONOperation -> Value -> Maybe Value
-applyOperation (Index i)   (AValue values) = if i < length values then Just (values !! i) else Nothing
+applyOperation (Index i)   (AValue values) = if i < length values then Just (values !! i)  else Nothing
 applyOperation (Get field) (OValue pairs)  = lookup field pairs
+applyOperation _ _                         = Nothing
 
 parse :: String -> Value
 parse ('{' : json) = (evaluate . (tokens JObject)) ('{' : json)
