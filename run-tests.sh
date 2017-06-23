@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-runghc TokeniserIndividualPartsTest.hs
-runghc ReductionTest.hs
-runghc EvalTest.hs
-runghc EndToEndTest.hs
+runghc -i./test test/TokeniserIndividualPartsTest.hs
+runghc -i./test test/ReductionTest.hs
+runghc -i./test test/EvalTest.hs
+runghc -i./test test/EndToEndTest.hs
