@@ -2,4 +2,6 @@
 runghc -i./test test/TokeniserIndividualPartsTest.hs
 runghc -i./test test/ReductionTest.hs
 runghc -i./test test/EvalTest.hs
-runghc -i./test test/EndToEndTest.hs
+cd test
+runghc -i./.. EndToEndTest.hs
+cd ..

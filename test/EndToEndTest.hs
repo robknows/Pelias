@@ -6,7 +6,7 @@ import RobUnit
 main :: IO ()
 main = do
   -- File test (Here because it involves IO cancer)
-  json            <- readFile "test/test.json"
+  json            <- readFile "test.json"
   (AValue values) <- pure $ parse json
   len             <- pure $ length values
 
