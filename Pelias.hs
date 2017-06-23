@@ -21,9 +21,16 @@ data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString 
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
   deriving (Show, Eq)
 
+-- Part of the API. None of the types above this are.
 data Value = SValue String | NValue String | BValue Bool | NullValue |
              OValue [(String, Value)] | AValue [Value]
   deriving (Show, Eq)
+
+data JSONOperation = Index Int | Get String
+  deriving (Show, Eq)
+
+extract :: [JSONOperation] -> String -> Maybe Value
+extract [] json = Just (parse json)
 
 parse :: String -> Value
 parse ('{' : json) = (evaluate . (tokens JObject)) ('{' : json)

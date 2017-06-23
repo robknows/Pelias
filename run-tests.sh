@@ -5,3 +5,4 @@ runghc -i./test test/EvalTest.hs
 cd test
 runghc -i./.. EndToEndTest.hs
 cd ..
+runghc -i./test test/APITest.hs
