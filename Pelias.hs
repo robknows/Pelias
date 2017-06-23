@@ -30,7 +30,19 @@ data JSONOperation = Index Int | Get String
   deriving (Show, Eq)
 
 extract :: [JSONOperation] -> String -> Maybe Value
-extract [] json = Just (parse json)
+extract ops = (extractValue ops) . parse . (optimiseInput ops)
+
+-- Not implemented yet
+optimiseInput :: [JSONOperation] -> String -> String
+optimiseInput ops = id
+
+extractValue :: [JSONOperation] -> Value -> Maybe Value
+extractValue [] json                           = Just json
+extractValue (Index i   : ops) (AValue values) = if i < length values then extractValue ops (values!!i) else Nothing
+extractValue (Get field : ops) (OValue pairs)  = 
+  case lookup field pairs of
+    Just  v -> extractValue ops v
+    Nothing -> Nothing
 
 parse :: String -> Value
 parse ('{' : json) = (evaluate . (tokens JObject)) ('{' : json)
