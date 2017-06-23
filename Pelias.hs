@@ -21,7 +21,7 @@ data GrammarPart = JDigits | JInt | JSimpleNumber | JExp | JNumber | JKeyString 
                    JArray | JElements | JObject | JMembers | JPair | JBool | JNull | JValue
   deriving (Show, Eq)
 
-data Value = SValue String | NValue String | BValue Constant | NullValue |
+data Value = SValue String | NValue String | BValue Bool | NullValue |
              OValue [(String, Value)] | AValue [Value]
   deriving (Show, Eq)
 
@@ -32,8 +32,8 @@ parse ('[' : json) = (evaluate . (tokens JArray))  ('[' : json)
 evaluate :: [Token] -> Value
 evaluate [StringValue s]    = SValue s
 evaluate [Number n]         = NValue n
-evaluate [Const T]          = BValue T
-evaluate [Const F]          = BValue F
+evaluate [Const T]          = BValue True
+evaluate [Const F]          = BValue False
 evaluate [Const N]          = NullValue
 
 -- THIS IS A HORRIBLE BUGFIX --
@@ -59,11 +59,11 @@ evaluatePairs ((Pair (k, ts))  : tokens) = (k, evaluate ts)  : evaluatePairs tok
 evaluateArrayContents :: [Token] -> [Value]
 evaluateArrayContents []                       = []
 evaluateArrayContents (Comma         : tokens) = evaluateArrayContents tokens
-evaluateArrayContents (StringValue s : tokens) = (SValue s) : evaluateArrayContents tokens
-evaluateArrayContents (Number n      : tokens) = (NValue n) : evaluateArrayContents tokens
-evaluateArrayContents (Const T       : tokens) = (BValue T) : evaluateArrayContents tokens
-evaluateArrayContents (Const F       : tokens) = (BValue F) : evaluateArrayContents tokens
-evaluateArrayContents (Const N       : tokens) = NullValue  : evaluateArrayContents tokens
+evaluateArrayContents (StringValue s : tokens) = (SValue s)     : evaluateArrayContents tokens
+evaluateArrayContents (Number n      : tokens) = (NValue n)     : evaluateArrayContents tokens
+evaluateArrayContents (Const T       : tokens) = (BValue True)  : evaluateArrayContents tokens
+evaluateArrayContents (Const F       : tokens) = (BValue False) : evaluateArrayContents tokens
+evaluateArrayContents (Const N       : tokens) = NullValue      : evaluateArrayContents tokens
 evaluateArrayContents (LCurly        : tokens) =
   case dropObject tokens of
     []   -> [OValue (evaluatePairs $ init tokens)]

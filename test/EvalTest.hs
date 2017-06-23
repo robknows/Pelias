@@ -29,7 +29,7 @@ tests = [
       (OValue [("key", AValue [])]),
   makeTest "can evaluate object with an array value with many elements of different types"
       (evaluate [LCurly, Pair ("key", [LSquare, StringValue "val", Number "12", Const T, Const F, Const N, RSquare]), RCurly])
-      (OValue [("key", AValue [SValue "val", NValue "12", BValue T, BValue F, NullValue])]),
+      (OValue [("key", AValue [SValue "val", NValue "12", BValue True, BValue False, NullValue])]),
   makeTest "can evaluate a 2D array with one empty element"
       (evaluate [LSquare, LSquare, RSquare, RSquare])
       (AValue [AValue []]),
@@ -59,12 +59,12 @@ tests = [
       (AValue [OValue [], OValue [("k", SValue "v")]]),
   makeTest "can evaluate an array containing two objects, where the neither are non-empty"
       (evaluate [LSquare, LCurly, Pair ("bool", [Const T]), RCurly, LCurly, Pair ("k", [StringValue "v"]), RCurly, RSquare])
-      (AValue [OValue [("bool", BValue T)], OValue [("k", SValue "v")]]),
+      (AValue [OValue [("bool", BValue True)], OValue [("k", SValue "v")]]),
   makeTest "can evaluate an array containing two objects, where the neither are non-empty and one contains an array"
       (evaluate [LSquare, LCurly, Pair ("arr", [LSquare, Const T, RSquare]), RCurly, LCurly, Pair ("k", [StringValue "v"]), RCurly, RSquare])
-      (AValue [OValue [("arr", AValue [BValue T])], OValue [("k", SValue "v")]]),
+      (AValue [OValue [("arr", AValue [BValue True])], OValue [("k", SValue "v")]]),
   makeTest "can evaluate an array containing two objects, where the neither are non-empty and one contains a nested object"
       (evaluate [LSquare, LCurly, Pair ("arr", [LSquare, Const T, RSquare]), RCurly, LCurly, Pair ("k", [LCurly, Pair ("x", [StringValue "v"]), RCurly]), RCurly, RSquare])
-      (AValue [OValue [("arr", AValue [BValue T])], OValue [("k", OValue [("x", SValue "v")])]])
+      (AValue [OValue [("arr", AValue [BValue True])], OValue [("k", OValue [("x", SValue "v")])]])
   
         ]
