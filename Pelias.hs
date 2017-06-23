@@ -30,9 +30,14 @@ data JSONOperation = Index Int | Get String
   deriving (Show, Eq)
 
 extract :: [JSONOperation] -> String -> Maybe Value
-extract ops = (extractValue ops) . parse . (optimiseInput ops)
+extract ops = (extractValue ops) . parse . (prepareInput ops)
 
--- Not implemented yet
+removeNewlinesAndTabs :: String -> String
+removeNewlinesAndTabs = concat . (map strip) . lines
+
+prepareInput :: [JSONOperation] -> String -> String
+prepareInput ops = (optimiseInput ops) . removeNewlinesAndTabs
+
 optimiseInput :: [JSONOperation] -> String -> String
 optimiseInput ops = id
 
@@ -96,15 +101,12 @@ evaluateArrayContents (LSquare       : tokens) =
     []    -> [AValue (evaluateArrayContents $ init tokens)]
     rest  -> (evaluateArrayContents $ takeArray tokens) ++ (evaluateArrayContents rest)
 
-removeNewlinesAndTabs :: String -> String
-removeNewlinesAndTabs = concat . (map strip) . lines
-
 converge :: Eq a => (a -> a) -> a -> a
 converge = until =<< ((==) =<<)
 
 tokens :: GrammarPart -> String -> [Token]
 tokens _        ""   = []
-tokens jsonPart json = ((converge reduce) . (snd . (tokenise jsonPart)) . removeNewlinesAndTabs) json
+tokens jsonPart json = ((converge reduce) . (snd . (tokenise jsonPart))) json
 
 reduce :: [Token] -> [Token]
 reduce []                          = []
