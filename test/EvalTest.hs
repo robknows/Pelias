@@ -6,7 +6,7 @@ import RobUnit
 main :: IO ()
 main = do
   putStrLn "=========EVALUATION========="
-  (putStr . concat . appendFailedCount) tests
+  runPureTests tests
   putStrLn "ALL DONE"
 
 tests :: [String]

@@ -8,7 +8,7 @@ import RobUnit
 main :: IO ()
 main = do
   putStrLn "=========TOKENISER INDIVIDUAL PARTS========="
-  (putStr . concat . appendFailedCount) tests
+  runPureTests tests
   putStrLn "ALL DONE"
 
 tests :: [String]

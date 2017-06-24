@@ -1,17 +1,20 @@
 module FixCatcherTest where
 
+import Control.Monad
+
 import Pelias
 import RobUnit
 
 main :: IO ()
 main = do
   -- File test (Here because it involves IO cancer)
-  json            <- readFile "test.json"
-  (AValue values) <- pure $ parse json
-  len             <- pure $ length values
+  -- json            <- readFile "test.json"
+  -- (AValue values) <- pure $ parse json
+  -- len             <- pure $ length values
 
   putStrLn "=========FIX CATCHER========="
-  (putStr . concat . appendFailedCount) (tests ++ [makeTest "array of many large objects" len 6])
+  runPureTests tests
+  runIOTests ioTests
   putStrLn "ALL DONE"
 
 tests :: [String]
@@ -22,3 +25,16 @@ tests = [
       (OValue [("gravatar_id", SValue ""), ("abc", SValue "123")])
         
         ]
+
+getValues :: Value -> [Value]
+getValues (AValue values) = values
+getValues _               = []
+
+ioTests :: [IO String]
+ioTests = [
+
+  ioTest "can get the number of values of an array"
+    (liftM (length . getValues . parse) (readFile "test.json"))
+    6
+
+          ]

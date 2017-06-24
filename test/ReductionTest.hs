@@ -8,7 +8,7 @@ import RobUnit
 main :: IO ()
 main = do
   putStrLn "=========REDUCER========="
-  (putStr . concat . appendFailedCount) (reduceTests ++ tokensTests)
+  runPureTests (reduceTests ++ tokensTests)
   putStrLn "ALL DONE"
 
 reduceTests :: [String]
