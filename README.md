@@ -5,18 +5,17 @@ It is my intention that this works as a single file that you can chuck into your
 
 It is very easy to use, but it is slow because I have done no optimisations. It uses the notoriously slow `String` type rather than the much faster `ByteString` and is not mutlithreaded in any way. This is purely on account of my laziness. I had a json related problem (see example) whose solution using Aeson was too shit for me, so I fixed that problem. That's Pelias.
 
+## Installing dependencies
+
+```
+./install-dependencies.sh
+```
+
 ## Testing
 
 To run the tests, simply run `./run-tests.sh`
 
 If you want to play around with an example, there is an example json file and it's optimiser in the folder called "example"
-
-## Required haskell libs
-
-```
-cabal update
-cabal install MissingH
-```
 
 # API
 
@@ -60,7 +59,7 @@ If your json is small, then you'll be fine. In this case, you can use plain old,
 
 `extract :: [JSONOperation] -> String -> Maybe Value`
 
-You give a list of operations you want to apply and a string of raw json to apply them to, and it applies them and returs you a result, given everything went well.
+You give a list of operations you want to apply and a string of raw json to apply them to, and it applies them and returns you a result, given everything went well.
 
 `extract` uses the default optimiser aka no optimiser at all. Hence it is very slow.
 
